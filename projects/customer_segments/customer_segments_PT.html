@@ -12125,10 +12125,12 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Resposta:</strong>
-O indice 30 é provavelmente uma lanchonete
-O indice 61 provavelmente é um mercadinho
-E o indice 250 talvez um café.</p>
+<p><strong>Resposta:</strong></p>
+<ul>
+<li>O indice 30 é provavelmente uma lanchonete, só metade dos atributo estão no 4º quartil e possue atributos no 2º além de atributos abaixo da média.</li>
+<li>O indice 61 provavelmente é um mercadinho ou algum tipo de varejista, já que esta no 4º quartil em todos os atributos menos em um e nesse que não se encontra no 4º quartil o atributo está acima da média.</li>
+<li>E o indice 250 talvez um café. Todos atributos estão abaixo da média e praticamente todos dentro do 1º ou 2º quartil.</li>
+</ul>
 
 </div>
 </div>
@@ -12486,7 +12488,7 @@ E o indice 250 talvez um café.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[183]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -12529,15 +12531,556 @@ E o indice 250 talvez um café.</p>
 </div>
 
 </div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[230]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">scipy.stats</span>
+
+<span class="c1">#distribuições possiveis</span>
+
+<span class="n">cdfs</span> <span class="o">=</span> <span class="p">[</span>
+<span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="c1"># An alpha continuous random variable.</span>
+<span class="s1">&#39;anglit&#39;</span><span class="p">,</span> <span class="c1">#An anglit continuous random variable.</span>
+<span class="s1">&#39;arcsine&#39;</span><span class="p">,</span><span class="c1">#An arcsine continuous random variable.</span>
+<span class="s1">&#39;argus&#39;</span><span class="p">,</span><span class="c1">#Argus distribution</span>
+<span class="s1">&#39;beta&#39;</span><span class="p">,</span><span class="c1">#A beta continuous random variable.</span>
+<span class="s1">&#39;betaprime&#39;</span><span class="p">,</span><span class="c1">#A beta prime continuous random variable.</span>
+<span class="s1">&#39;bradford&#39;</span><span class="p">,</span><span class="c1">#A Bradford continuous random variable.</span>
+<span class="s1">&#39;burr&#39;</span><span class="p">,</span><span class="c1">#A Burr (Type III) continuous random variable.</span>
+<span class="s1">&#39;burr12&#39;</span><span class="p">,</span><span class="c1">#A Burr (Type XII) continuous random variable.</span>
+<span class="s1">&#39;cauchy&#39;</span><span class="p">,</span><span class="c1">#A Cauchy continuous random variable.</span>
+<span class="s1">&#39;chi&#39;</span><span class="p">,</span><span class="c1">#A chi continuous random variable.</span>
+<span class="s1">&#39;chi2&#39;</span><span class="p">,</span><span class="c1">#A chi-squared continuous random variable.</span>
+<span class="s1">&#39;cosine&#39;</span><span class="p">,</span><span class="c1">#A cosine continuous random variable.</span>
+<span class="s1">&#39;crystalball&#39;</span><span class="p">,</span><span class="c1">#Crystalball distribution</span>
+<span class="s1">&#39;dgamma&#39;</span><span class="p">,</span><span class="c1">#A double gamma continuous random variable.</span>
+<span class="s1">&#39;dweibull&#39;</span><span class="p">,</span><span class="c1">#A double Weibull continuous random variable.</span>
+<span class="c1">#&#39;erlang&#39;,#An Erlang continuous random variable.</span>
+<span class="s1">&#39;expon&#39;</span><span class="p">,</span><span class="c1">#An exponential continuous random variable.</span>
+<span class="s1">&#39;exponnorm&#39;</span><span class="p">,</span><span class="c1">#An exponentially modified Normal continuous random variable.</span>
+<span class="s1">&#39;exponweib&#39;</span><span class="p">,</span><span class="c1">#An exponentiated Weibull continuous random variable.</span>
+<span class="s1">&#39;exponpow&#39;</span><span class="p">,</span><span class="c1">#An exponential power continuous random variable.</span>
+<span class="s1">&#39;f&#39;</span><span class="p">,</span><span class="c1">#An F continuous random variable.</span>
+<span class="s1">&#39;fatiguelife&#39;</span><span class="p">,</span><span class="c1">#A fatigue-life (Birnbaum-Saunders) continuous random variable.</span>
+<span class="s1">&#39;fisk&#39;</span><span class="p">,</span><span class="c1">#A Fisk continuous random variable.</span>
+<span class="s1">&#39;foldcauchy&#39;</span><span class="p">,</span><span class="c1">#A folded Cauchy continuous random variable.</span>
+<span class="s1">&#39;foldnorm&#39;</span><span class="p">,</span><span class="c1">#A folded normal continuous random variable.</span>
+<span class="s1">&#39;genlogistic&#39;</span><span class="p">,</span><span class="c1">#A generalized logistic continuous random variable.</span>
+<span class="s1">&#39;gennorm&#39;</span><span class="p">,</span><span class="c1">#A generalized normal continuous random variable.</span>
+<span class="s1">&#39;genpareto&#39;</span><span class="p">,</span><span class="c1">#A generalized Pareto continuous random variable.</span>
+<span class="s1">&#39;genexpon&#39;</span><span class="p">,</span><span class="c1">#A generalized exponential continuous random variable.</span>
+<span class="s1">&#39;genextreme&#39;</span><span class="p">,</span><span class="c1">#A generalized extreme value continuous random variable.</span>
+<span class="s1">&#39;gausshyper&#39;</span><span class="p">,</span><span class="c1">#A Gauss hypergeometric continuous random variable.</span>
+<span class="s1">&#39;gamma&#39;</span><span class="p">,</span><span class="c1">#A gamma continuous random variable.</span>
+<span class="s1">&#39;gengamma&#39;</span><span class="p">,</span><span class="c1">#A generalized gamma continuous random variable.</span>
+<span class="s1">&#39;genhalflogistic&#39;</span><span class="p">,</span><span class="c1">#A generalized half-logistic continuous random variable.</span>
+<span class="s1">&#39;gilbrat&#39;</span><span class="p">,</span><span class="c1">#A Gilbrat continuous random variable.</span>
+<span class="s1">&#39;gompertz&#39;</span><span class="p">,</span><span class="c1">#A Gompertz (or truncated Gumbel) continuous random variable.</span>
+<span class="s1">&#39;gumbel_r&#39;</span><span class="p">,</span><span class="c1">#A right-skewed Gumbel continuous random variable.</span>
+<span class="s1">&#39;gumbel_l&#39;</span><span class="p">,</span><span class="c1">#A left-skewed Gumbel continuous random variable.</span>
+<span class="s1">&#39;halfcauchy&#39;</span><span class="p">,</span><span class="c1">#A Half-Cauchy continuous random variable.</span>
+<span class="s1">&#39;halflogistic&#39;</span><span class="p">,</span><span class="c1">#A half-logistic continuous random variable.</span>
+<span class="s1">&#39;halfnorm&#39;</span><span class="p">,</span><span class="c1">#A half-normal continuous random variable.</span>
+<span class="s1">&#39;halfgennorm&#39;</span><span class="p">,</span><span class="c1">#The upper half of a generalized normal continuous random variable.</span>
+<span class="s1">&#39;hypsecant&#39;</span><span class="p">,</span><span class="c1">#A hyperbolic secant continuous random variable.</span>
+<span class="s1">&#39;invgamma&#39;</span><span class="p">,</span><span class="c1">#An inverted gamma continuous random variable.</span>
+<span class="s1">&#39;invgauss&#39;</span><span class="p">,</span><span class="c1">#An inverse Gaussian continuous random variable.</span>
+<span class="s1">&#39;invweibull&#39;</span><span class="p">,</span><span class="c1">#An inverted Weibull continuous random variable.</span>
+<span class="s1">&#39;johnsonsb&#39;</span><span class="p">,</span><span class="c1">#A Johnson SB continuous random variable.</span>
+<span class="s1">&#39;johnsonsu&#39;</span><span class="p">,</span><span class="c1">#A Johnson SU continuous random variable.</span>
+<span class="s1">&#39;kappa4&#39;</span><span class="p">,</span><span class="c1">#Kappa 4 parameter distribution.</span>
+<span class="s1">&#39;kappa3&#39;</span><span class="p">,</span><span class="c1">#Kappa 3 parameter distribution.</span>
+<span class="s1">&#39;ksone&#39;</span><span class="p">,</span><span class="c1">#General Kolmogorov-Smirnov one-sided test.</span>
+<span class="s1">&#39;kstwobign&#39;</span><span class="p">,</span><span class="c1">#Kolmogorov-Smirnov two-sided test for large N.</span>
+<span class="s1">&#39;laplace&#39;</span><span class="p">,</span><span class="c1">#A Laplace continuous random variable.</span>
+<span class="s1">&#39;levy&#39;</span><span class="p">,</span><span class="c1">#A Levy continuous random variable.</span>
+<span class="s1">&#39;levy_l&#39;</span><span class="p">,</span><span class="c1">#A left-skewed Levy continuous random variable.</span>
+<span class="s1">&#39;logistic&#39;</span><span class="p">,</span><span class="c1">#A logistic (or Sech-squared) continuous random variable.</span>
+<span class="s1">&#39;loggamma&#39;</span><span class="p">,</span><span class="c1">#A log gamma continuous random variable.</span>
+<span class="s1">&#39;loglaplace&#39;</span><span class="p">,</span><span class="c1">#A log-Laplace continuous random variable.</span>
+<span class="s1">&#39;lognorm&#39;</span><span class="p">,</span><span class="c1">#A lognormal continuous random variable.</span>
+<span class="s1">&#39;lomax&#39;</span><span class="p">,</span><span class="c1">#A Lomax (Pareto of the second kind) continuous random variable.</span>
+<span class="s1">&#39;maxwell&#39;</span><span class="p">,</span><span class="c1">#A Maxwell continuous random variable.</span>
+<span class="s1">&#39;mielke&#39;</span><span class="p">,</span><span class="c1">#A Mielke’s Beta-Kappa continuous random variable.</span>
+<span class="s1">&#39;nakagami&#39;</span><span class="p">,</span><span class="c1">#A Nakagami continuous random variable.</span>
+<span class="s1">&#39;ncx2&#39;</span><span class="p">,</span><span class="c1">#A non-central chi-squared continuous random variable.</span>
+<span class="s1">&#39;ncf&#39;</span><span class="p">,</span><span class="c1">#A non-central F distribution continuous random variable.</span>
+<span class="s1">&#39;nct&#39;</span><span class="p">,</span><span class="c1">#A non-central Student’s T continuous random variable.</span>
+<span class="s1">&#39;norm&#39;</span><span class="p">,</span><span class="c1">#A normal continuous random variable.</span>
+<span class="s1">&#39;pareto&#39;</span><span class="p">,</span><span class="c1">#A Pareto continuous random variable.</span>
+<span class="s1">&#39;pearson3&#39;</span><span class="p">,</span><span class="c1">#A pearson type III continuous random variable.</span>
+<span class="s1">&#39;powerlaw&#39;</span><span class="p">,</span><span class="c1">#A power-function continuous random variable.</span>
+<span class="s1">&#39;powerlognorm&#39;</span><span class="p">,</span><span class="c1">#A power log-normal continuous random variable.</span>
+<span class="s1">&#39;powernorm&#39;</span><span class="p">,</span><span class="c1">#A power normal continuous random variable.</span>
+<span class="s1">&#39;rdist&#39;</span><span class="p">,</span><span class="c1">#An R-distributed continuous random variable.</span>
+<span class="s1">&#39;reciprocal&#39;</span><span class="p">,</span><span class="c1">#A reciprocal continuous random variable.</span>
+<span class="s1">&#39;rayleigh&#39;</span><span class="p">,</span><span class="c1">#A Rayleigh continuous random variable.</span>
+<span class="s1">&#39;rice&#39;</span><span class="p">,</span><span class="c1">#A Rice continuous random variable.</span>
+<span class="s1">&#39;recipinvgauss&#39;</span><span class="p">,</span><span class="c1">#A reciprocal inverse Gaussian continuous random variable.</span>
+<span class="s1">&#39;semicircular&#39;</span><span class="p">,</span><span class="c1">#A semicircular continuous random variable.</span>
+<span class="s1">&#39;skewnorm&#39;</span><span class="p">,</span><span class="c1">#A skew-normal random variable.</span>
+<span class="s1">&#39;t&#39;</span><span class="p">,</span><span class="c1">#A Student’s T continuous random variable.</span>
+<span class="s1">&#39;trapz&#39;</span><span class="p">,</span><span class="c1">#A trapezoidal continuous random variable.</span>
+<span class="s1">&#39;triang&#39;</span><span class="p">,</span><span class="c1">#A triangular continuous random variable.</span>
+<span class="s1">&#39;truncexpon&#39;</span><span class="p">,</span><span class="c1">#A truncated exponential continuous random variable.</span>
+<span class="s1">&#39;truncnorm&#39;</span><span class="p">,</span><span class="c1">#A truncated normal continuous random variable.</span>
+<span class="s1">&#39;tukeylambda&#39;</span><span class="p">,</span><span class="c1">#A Tukey-Lamdba continuous random variable.</span>
+<span class="s1">&#39;uniform&#39;</span><span class="p">,</span><span class="c1">#A uniform continuous random variable.</span>
+<span class="s1">&#39;vonmises&#39;</span><span class="p">,</span><span class="c1">#A Von Mises continuous random variable.</span>
+<span class="s1">&#39;vonmises_line&#39;</span><span class="p">,</span><span class="c1">#A Von Mises continuous random variable.</span>
+<span class="s1">&#39;wald&#39;</span><span class="p">,</span><span class="c1">#A Wald continuous random variable.</span>
+<span class="s1">&#39;weibull_min&#39;</span><span class="p">,</span><span class="c1">#Weibull minimum continuous random variable.</span>
+<span class="s1">&#39;weibull_max&#39;</span><span class="p">,</span><span class="c1">#Weibull maximum continuous random variable.</span>
+<span class="s1">&#39;wrapcauchy&#39;</span><span class="p">]</span><span class="c1">#A wrapped Cauchy continuous random variable.</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[243]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">distrs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">results</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">cdf</span> <span class="ow">in</span> <span class="n">cdfs</span><span class="p">:</span>
+        <span class="c1">#fit our data set against every probability distribution</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s2">&quot;scipy.stats.&quot;</span><span class="o">+</span><span class="n">cdf</span><span class="o">+</span><span class="s2">&quot;.fit(sample)&quot;</span><span class="p">);</span>
+ 
+        <span class="c1">#Applying the Kolmogorov-Smirnof one sided test</span>
+        <span class="n">D</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kstest</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">cdf</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">parameters</span><span class="p">);</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">D</span><span class="p">,</span><span class="n">p</span><span class="p">])</span> 
+        <span class="c1">#pretty-print the results</span>
+        <span class="c1">#print (cdf.ljust(16) + (&quot;p: &quot;+str(p)).ljust(25)+&quot;D: &quot;+str(D));</span>
+        <span class="c1">#cria um dataframe com os resultados do teste k-s e tira todos os nan</span>
+    <span class="n">distr</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;D&#39;</span><span class="p">],</span><span class="n">index</span><span class="o">=</span><span class="n">cdfs</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="c1"># tira todas as distribuições que não tem pelo menos 95% de probabilidade dos dados estaram</span>
+    <span class="c1"># dentro da distribuição. E ordena todas as distruições da que tem maior probabilidade dos </span>
+    <span class="c1"># dados estarem nela até a que tem menor probabilidade chegando a 95%.</span>
+    <span class="n">distr</span> <span class="o">=</span> <span class="n">distr</span><span class="p">[</span><span class="n">distr</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span><span class="o">&gt;=.</span><span class="mi">95</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">distrs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">distr</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>C:\ProgramData\Anaconda3\lib\site-packages\scipy\optimize\minpack.py:161: RuntimeWarning: The iteration is not making good progress, as measured by the 
+  improvement from the last ten iterations.
+  warnings.warn(msg, RuntimeWarning)
+C:\ProgramData\Anaconda3\lib\site-packages\scipy\integrate\quadpack.py:364: IntegrationWarning: The maximum number of subdivisions (50) has been achieved.
+  If increasing the limit yields no improvement it is advised to analyze 
+  the integrand in order to determine the difficulties.  If the position of a 
+  local difficulty can be determined (singularity, discontinuity) one will 
+  probably gain from splitting up the interval and calling the integrator 
+  on the subranges.  Perhaps a special-purpose integrator should be used.
+  warnings.warn(msg, IntegrationWarning)
+C:\ProgramData\Anaconda3\lib\site-packages\scipy\stats\_continuous_distns.py:43: RuntimeWarning: floating point number truncated to an integer
+  return 1.0 - sc.smirnov(n, x)
+C:\ProgramData\Anaconda3\lib\site-packages\scipy\integrate\quadpack.py:364: IntegrationWarning: Extremely bad integrand behavior occurs at some points of the
+  integration interval.
+  warnings.warn(msg, IntegrationWarning)
+C:\ProgramData\Anaconda3\lib\site-packages\scipy\integrate\quadpack.py:364: IntegrationWarning: The integral is probably divergent, or slowly convergent.
+  warnings.warn(msg, IntegrationWarning)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[266]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">distrs</span><span class="p">)):</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">distrs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>p</th>
+      <th>D</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>powernorm</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>reciprocal</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>truncnorm</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>ncx2</th>
+      <td>0.966666</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>p</th>
+      <th>D</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>powernorm</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>reciprocal</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>truncnorm</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>crystalball</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>p</th>
+      <th>D</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>crystalball</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>powernorm</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>reciprocal</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>truncnorm</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>gamma</th>
+      <td>0.997727</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>p</th>
+      <th>D</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>powernorm</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>reciprocal</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>truncnorm</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>gamma</th>
+      <td>0.997714</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>p</th>
+      <th>D</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>powernorm</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>reciprocal</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>truncnorm</th>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>p</th>
+      <th>D</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>powernorm</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>reciprocal</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>truncnorm</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>gamma</th>
+      <td>0.993323</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Resposta:</strong></p>
-<p>Todos os atributos estão distribuidos normalmente , possuem outliers, grande dispersão e uma baixa média considerando a variancia encontrada, além de um grande desvio padrão em todos o desvio padrão é maior que a média, a presença de outliers é marcante,o terceiro quartil por exemplo é marcado com valor mais de 10 vezes menor que os valores máximos. As medianas ficam bem longe dos médias a mais proxima é 40% menor e chegasse a uma diferença de 352% na média são quase a metade, o que realmente mostra valores mais próximos de 0.</p>
+<p>Todos os atributos estão distribuidos assimetricamente a direita, e estão dentro de uma distribuição 'power normal' - 'potencia normal' ou uma distribuição normal truncada e algums se encaixam em uma distribuição gamma exatamente pela assimetia a direita , possuem outliers, grande dispersão e uma baixa média considerando a varincia encontrada, além de um grande desvio padrão em todos o desvio padrão é maior que a média, e a média maior que a mediana, a presença de outliers é marcante,o terceiro quartil por exemplo é marcado com valor mais de 10 vezes menor que os valores máximos. As medianas ficam bem longe dos médias a mais proxima é 40% menor e chegasse a uma diferença de 352% na média são quase a metade, o que realmente mostra valores mais próximos de 0.</p>
 <p>Parece existir uma correlação entre a compra de laticínios e secos e molhados, e desse também com higiene e limpeza. No segundo para a correlação é maior e da para ver isso graficamente, observando que se forma quase uma linha no gráfico que relaciona os dois.</p>
 <p>Isso confirma que o atributo previsto é importante já que não há outro com correlação forte ele.
-O atributo está normalmente distribuido, tem como todos os demais uma mediana bem abaixo da média, o ultimo quartil é responsável por 67% do faturamento nesse tipo de produto, para se ter ideia de quanto o gasto está concentrado o ultimo vintil, ou seja aqueles 5% que mais gastaram são responsaveis por 30% do faturamento.</p>
+O atributo está distribuido assim como os demais, tem como todos os demais uma mediana bem abaixo da média, o ultimo quartil é responsável por 67% do faturamento nesse tipo de produto, para se ter ideia de quanto o gasto está concentrado o ultimo vintil, ou seja aqueles 5% que mais gastaram são responsaveis por 30% do faturamento.</p>
+<p>O algoritmo de teste para distribuições foi retirado do site abaixo e adaptado ao caso:</p>
+<p><a href="http://www.aizac.info/simple-check-of-a-sample-against-80-distributions/">http://www.aizac.info/simple-check-of-a-sample-against-80-distributions/</a></p>
 
 </div>
 </div>
@@ -12727,17 +13270,17 @@ O atributo está normalmente distribuido, tem como todos os demais uma mediana b
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[267]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Para cada atributo encontre os pontos de dados com máximos valores altos e baixos</span>
 <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">log_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
     
     <span class="c1"># TODO: Calcule Q1 (25º percentil dos dados) para o atributo dado</span>
-    <span class="n">Q1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">log_data</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span><span class="mf">0.25</span><span class="p">)</span>
+    <span class="n">Q1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">log_data</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span><span class="mi">25</span><span class="p">)</span>
     
     <span class="c1"># TODO: Calcule Q3 (75º percentil dos dados) para o atributo dado</span>
-    <span class="n">Q3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">log_data</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span><span class="mf">0.75</span><span class="p">)</span>
+    <span class="n">Q3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">log_data</span><span class="p">[</span><span class="n">feature</span><span class="p">],</span><span class="mi">75</span><span class="p">)</span>
     
     <span class="c1"># TODO: Utilize a amplitude interquartil para calcular o passo do discrepante (1,5 vezes a variação interquartil)</span>
     <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">Q3</span><span class="o">-</span><span class="n">Q1</span><span class="p">)</span><span class="o">*</span><span class="mf">1.5</span>
@@ -12809,557 +13352,151 @@ O atributo está normalmente distribuido, tem como todos os demais uma mediana b
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>9.446913</td>
-      <td>9.175335</td>
-      <td>8.930759</td>
-      <td>5.365976</td>
-      <td>7.891331</td>
-      <td>7.198931</td>
+      <th>65</th>
+      <td>4.442651</td>
+      <td>9.950323</td>
+      <td>10.732651</td>
+      <td>3.583519</td>
+      <td>10.095388</td>
+      <td>7.260523</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>8.861775</td>
-      <td>9.191158</td>
-      <td>9.166179</td>
-      <td>7.474205</td>
-      <td>8.099554</td>
-      <td>7.482119</td>
+      <th>66</th>
+      <td>2.197225</td>
+      <td>7.335634</td>
+      <td>8.911530</td>
+      <td>5.164786</td>
+      <td>8.151333</td>
+      <td>3.295837</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>8.756682</td>
-      <td>9.083416</td>
-      <td>8.946896</td>
-      <td>7.785305</td>
-      <td>8.165079</td>
-      <td>8.967504</td>
+      <th>81</th>
+      <td>5.389072</td>
+      <td>9.163249</td>
+      <td>9.575192</td>
+      <td>5.645447</td>
+      <td>8.964184</td>
+      <td>5.049856</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>9.492884</td>
-      <td>7.086738</td>
-      <td>8.347827</td>
-      <td>8.764678</td>
-      <td>6.228511</td>
-      <td>7.488853</td>
+      <th>95</th>
+      <td>1.098612</td>
+      <td>7.979339</td>
+      <td>8.740657</td>
+      <td>6.086775</td>
+      <td>5.407172</td>
+      <td>6.563856</td>
     </tr>
     <tr>
-      <th>4</th>
-      <td>10.026369</td>
-      <td>8.596004</td>
-      <td>8.881558</td>
-      <td>8.272571</td>
-      <td>7.482682</td>
-      <td>8.553525</td>
+      <th>96</th>
+      <td>3.135494</td>
+      <td>7.869402</td>
+      <td>9.001839</td>
+      <td>4.976734</td>
+      <td>8.262043</td>
+      <td>5.379897</td>
     </tr>
     <tr>
-      <th>5</th>
-      <td>9.149847</td>
-      <td>9.019059</td>
-      <td>8.542081</td>
-      <td>6.501290</td>
-      <td>7.492760</td>
-      <td>7.280008</td>
+      <th>128</th>
+      <td>4.941642</td>
+      <td>9.087834</td>
+      <td>8.248791</td>
+      <td>4.955827</td>
+      <td>6.967909</td>
+      <td>1.098612</td>
     </tr>
     <tr>
-      <th>6</th>
-      <td>9.403107</td>
-      <td>8.070594</td>
-      <td>8.850088</td>
-      <td>6.173786</td>
-      <td>8.051978</td>
-      <td>6.300786</td>
+      <th>171</th>
+      <td>5.298317</td>
+      <td>10.160530</td>
+      <td>9.894245</td>
+      <td>6.478510</td>
+      <td>9.079434</td>
+      <td>8.740337</td>
     </tr>
     <tr>
-      <th>7</th>
-      <td>8.933137</td>
-      <td>8.508354</td>
-      <td>9.151227</td>
-      <td>7.419980</td>
-      <td>8.108021</td>
-      <td>7.850104</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>8.693329</td>
-      <td>8.201934</td>
-      <td>8.731013</td>
-      <td>6.052089</td>
-      <td>7.447751</td>
-      <td>6.620073</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>8.700514</td>
-      <td>9.314070</td>
-      <td>9.845911</td>
-      <td>7.055313</td>
-      <td>8.912608</td>
-      <td>7.648740</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>8.121480</td>
-      <td>8.594710</td>
-      <td>9.470703</td>
-      <td>8.389360</td>
-      <td>8.695674</td>
-      <td>7.463937</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>9.483873</td>
-      <td>7.024649</td>
-      <td>8.416931</td>
-      <td>7.258412</td>
-      <td>6.308098</td>
-      <td>6.208590</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>10.364514</td>
-      <td>9.418898</td>
-      <td>9.372204</td>
-      <td>5.659482</td>
-      <td>8.263848</td>
-      <td>7.983099</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>9.962558</td>
-      <td>8.733594</td>
-      <td>9.614605</td>
-      <td>8.037543</td>
-      <td>8.810907</td>
-      <td>6.400257</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>10.112654</td>
-      <td>9.155356</td>
-      <td>9.400217</td>
-      <td>5.683580</td>
-      <td>8.528726</td>
-      <td>7.681560</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>9.235326</td>
-      <td>7.015712</td>
-      <td>8.248267</td>
-      <td>5.983936</td>
-      <td>6.871091</td>
-      <td>6.021023</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>6.927558</td>
-      <td>9.084324</td>
-      <td>9.402695</td>
-      <td>4.897840</td>
-      <td>8.413609</td>
-      <td>6.984716</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>8.678632</td>
-      <td>8.725345</td>
-      <td>7.983781</td>
-      <td>6.732211</td>
-      <td>5.913503</td>
-      <td>8.406932</td>
-    </tr>
-    <tr>
-      <th>18</th>
-      <td>9.830971</td>
-      <td>8.752581</td>
-      <td>9.220192</td>
-      <td>7.698483</td>
-      <td>7.925519</td>
-      <td>8.064951</td>
-    </tr>
-    <tr>
-      <th>19</th>
-      <td>8.959312</td>
-      <td>7.822044</td>
-      <td>9.155250</td>
-      <td>6.505784</td>
-      <td>7.831220</td>
-      <td>6.216606</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>9.772581</td>
-      <td>8.416046</td>
-      <td>8.434246</td>
-      <td>6.971669</td>
-      <td>7.722678</td>
-      <td>7.661056</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>8.624612</td>
-      <td>6.769642</td>
-      <td>7.605890</td>
-      <td>8.126518</td>
-      <td>5.926926</td>
-      <td>6.343880</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>10.350606</td>
-      <td>7.558517</td>
-      <td>8.404920</td>
-      <td>9.149316</td>
-      <td>7.775276</td>
-      <td>8.374246</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>10.180096</td>
-      <td>10.502956</td>
-      <td>9.999661</td>
-      <td>8.547528</td>
-      <td>8.374938</td>
-      <td>9.712509</td>
-    </tr>
-    <tr>
-      <th>24</th>
-      <td>10.027783</td>
-      <td>9.187686</td>
-      <td>9.531844</td>
-      <td>7.977625</td>
-      <td>8.407825</td>
-      <td>8.661813</td>
-    </tr>
-    <tr>
-      <th>25</th>
-      <td>9.690604</td>
-      <td>8.349957</td>
-      <td>8.935245</td>
-      <td>5.303305</td>
-      <td>8.294799</td>
-      <td>4.043051</td>
-    </tr>
-    <tr>
-      <th>26</th>
-      <td>9.200088</td>
-      <td>6.867974</td>
-      <td>7.958926</td>
-      <td>8.055475</td>
-      <td>5.488938</td>
-      <td>6.725034</td>
-    </tr>
-    <tr>
-      <th>27</th>
-      <td>9.566335</td>
-      <td>6.688355</td>
-      <td>8.021256</td>
-      <td>6.184149</td>
-      <td>4.605170</td>
-      <td>6.249975</td>
-    </tr>
-    <tr>
-      <th>28</th>
-      <td>8.321908</td>
-      <td>9.927399</td>
-      <td>10.164197</td>
-      <td>7.054450</td>
-      <td>9.059982</td>
-      <td>8.557567</td>
-    </tr>
-    <tr>
-      <th>29</th>
-      <td>10.671000</td>
-      <td>7.649693</td>
-      <td>7.866722</td>
-      <td>7.090077</td>
-      <td>7.009409</td>
-      <td>6.712956</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>409</th>
-      <td>9.071997</td>
-      <td>8.198089</td>
-      <td>8.716044</td>
-      <td>7.761745</td>
-      <td>7.660585</td>
-      <td>8.544225</td>
-    </tr>
-    <tr>
-      <th>410</th>
-      <td>8.799812</td>
-      <td>7.647786</td>
-      <td>8.425736</td>
-      <td>7.236339</td>
-      <td>7.528332</td>
-      <td>7.545390</td>
-    </tr>
-    <tr>
-      <th>411</th>
-      <td>7.661998</td>
-      <td>8.098339</td>
-      <td>8.095904</td>
-      <td>7.336286</td>
-      <td>5.459586</td>
-      <td>8.381373</td>
-    </tr>
-    <tr>
-      <th>413</th>
-      <td>8.513787</td>
-      <td>8.488588</td>
-      <td>8.799812</td>
-      <td>9.790655</td>
-      <td>6.815640</td>
-      <td>7.797702</td>
-    </tr>
-    <tr>
-      <th>414</th>
-      <td>8.694335</td>
-      <td>7.595890</td>
-      <td>8.136518</td>
-      <td>8.644530</td>
-      <td>7.034388</td>
-      <td>5.669881</td>
-    </tr>
-    <tr>
-      <th>415</th>
-      <td>8.967249</td>
-      <td>8.707152</td>
-      <td>9.053920</td>
-      <td>7.433075</td>
-      <td>8.171882</td>
-      <td>7.535830</td>
-    </tr>
-    <tr>
-      <th>416</th>
-      <td>8.386857</td>
-      <td>9.300181</td>
-      <td>9.297252</td>
-      <td>6.742881</td>
-      <td>8.814033</td>
-      <td>6.900731</td>
-    </tr>
-    <tr>
-      <th>417</th>
-      <td>8.530109</td>
-      <td>8.612322</td>
-      <td>9.310638</td>
-      <td>5.897154</td>
+      <th>193</th>
+      <td>5.192957</td>
       <td>8.156223</td>
-      <td>6.968850</td>
+      <td>9.917982</td>
+      <td>6.865891</td>
+      <td>8.633731</td>
+      <td>6.501290</td>
     </tr>
     <tr>
-      <th>418</th>
-      <td>6.492240</td>
-      <td>9.047115</td>
-      <td>9.832099</td>
-      <td>4.890349</td>
-      <td>8.815815</td>
-      <td>6.654153</td>
+      <th>218</th>
+      <td>2.890372</td>
+      <td>8.923191</td>
+      <td>9.629380</td>
+      <td>7.158514</td>
+      <td>8.475746</td>
+      <td>8.759669</td>
     </tr>
     <tr>
-      <th>419</th>
-      <td>9.089415</td>
-      <td>8.238273</td>
-      <td>7.706613</td>
-      <td>6.450470</td>
-      <td>7.365180</td>
-      <td>7.327123</td>
+      <th>304</th>
+      <td>5.081404</td>
+      <td>8.917311</td>
+      <td>10.117510</td>
+      <td>6.424869</td>
+      <td>9.374413</td>
+      <td>7.787382</td>
     </tr>
     <tr>
-      <th>420</th>
-      <td>8.402007</td>
-      <td>8.569026</td>
-      <td>9.490015</td>
-      <td>3.218876</td>
-      <td>8.827321</td>
-      <td>7.239215</td>
+      <th>305</th>
+      <td>5.493061</td>
+      <td>9.468001</td>
+      <td>9.088399</td>
+      <td>6.683361</td>
+      <td>8.271037</td>
+      <td>5.351858</td>
     </tr>
     <tr>
-      <th>421</th>
-      <td>9.744668</td>
-      <td>8.486115</td>
-      <td>9.110851</td>
-      <td>6.938284</td>
-      <td>8.135933</td>
-      <td>7.486613</td>
+      <th>338</th>
+      <td>1.098612</td>
+      <td>5.808142</td>
+      <td>8.856661</td>
+      <td>9.655090</td>
+      <td>2.708050</td>
+      <td>6.309918</td>
     </tr>
     <tr>
-      <th>422</th>
-      <td>10.181119</td>
-      <td>7.227662</td>
-      <td>8.336151</td>
-      <td>6.721426</td>
-      <td>6.854355</td>
-      <td>7.104965</td>
+      <th>353</th>
+      <td>4.762174</td>
+      <td>8.742574</td>
+      <td>9.961898</td>
+      <td>5.429346</td>
+      <td>9.069007</td>
+      <td>7.013016</td>
     </tr>
     <tr>
-      <th>423</th>
-      <td>9.773664</td>
-      <td>8.212297</td>
-      <td>8.446127</td>
-      <td>6.965080</td>
-      <td>7.497207</td>
-      <td>6.504288</td>
+      <th>355</th>
+      <td>5.247024</td>
+      <td>6.588926</td>
+      <td>7.606885</td>
+      <td>5.501258</td>
+      <td>5.214936</td>
+      <td>4.844187</td>
     </tr>
     <tr>
-      <th>424</th>
-      <td>9.739791</td>
-      <td>7.966933</td>
-      <td>9.411811</td>
-      <td>6.773080</td>
-      <td>8.074960</td>
-      <td>5.517453</td>
+      <th>357</th>
+      <td>3.610918</td>
+      <td>7.150701</td>
+      <td>10.011086</td>
+      <td>4.919981</td>
+      <td>8.816853</td>
+      <td>4.700480</td>
     </tr>
     <tr>
-      <th>425</th>
-      <td>9.327501</td>
-      <td>7.786552</td>
-      <td>7.860571</td>
-      <td>9.638740</td>
-      <td>4.682131</td>
-      <td>7.542213</td>
-    </tr>
-    <tr>
-      <th>426</th>
-      <td>9.482960</td>
-      <td>9.142811</td>
-      <td>9.569133</td>
-      <td>8.052296</td>
-      <td>8.532870</td>
-      <td>7.546446</td>
-    </tr>
-    <tr>
-      <th>427</th>
-      <td>10.342130</td>
-      <td>9.722385</td>
-      <td>8.599510</td>
-      <td>9.621257</td>
-      <td>6.084499</td>
-      <td>7.058758</td>
-    </tr>
-    <tr>
-      <th>428</th>
-      <td>8.021913</td>
-      <td>8.694502</td>
-      <td>8.499029</td>
-      <td>7.695303</td>
-      <td>6.745236</td>
-      <td>5.758902</td>
-    </tr>
-    <tr>
-      <th>429</th>
-      <td>9.060331</td>
-      <td>7.467371</td>
-      <td>8.183118</td>
-      <td>3.850148</td>
-      <td>4.430817</td>
-      <td>7.824446</td>
-    </tr>
-    <tr>
-      <th>430</th>
-      <td>8.038189</td>
-      <td>8.349957</td>
-      <td>9.710085</td>
-      <td>6.354370</td>
-      <td>5.484797</td>
-      <td>7.640123</td>
-    </tr>
-    <tr>
-      <th>431</th>
-      <td>9.051696</td>
-      <td>8.613594</td>
-      <td>8.548692</td>
-      <td>9.509407</td>
-      <td>7.227662</td>
-      <td>7.311886</td>
-    </tr>
-    <tr>
-      <th>432</th>
-      <td>9.957834</td>
-      <td>7.057898</td>
-      <td>8.466742</td>
-      <td>5.594711</td>
-      <td>7.191429</td>
-      <td>5.978886</td>
-    </tr>
-    <tr>
-      <th>433</th>
-      <td>7.591862</td>
-      <td>8.076515</td>
-      <td>7.308543</td>
-      <td>7.340187</td>
-      <td>5.874931</td>
-      <td>7.278629</td>
-    </tr>
-    <tr>
-      <th>434</th>
-      <td>9.725019</td>
-      <td>8.274357</td>
-      <td>8.986447</td>
-      <td>6.533789</td>
-      <td>7.771067</td>
-      <td>6.731018</td>
-    </tr>
-    <tr>
-      <th>435</th>
-      <td>10.299003</td>
-      <td>9.396903</td>
-      <td>9.682030</td>
-      <td>9.483036</td>
-      <td>5.204007</td>
-      <td>7.698029</td>
-    </tr>
-    <tr>
-      <th>436</th>
-      <td>10.577146</td>
-      <td>7.266129</td>
-      <td>6.638568</td>
-      <td>8.414052</td>
-      <td>4.532599</td>
-      <td>7.760467</td>
-    </tr>
-    <tr>
-      <th>437</th>
-      <td>9.584040</td>
-      <td>9.647821</td>
-      <td>10.317020</td>
-      <td>6.079933</td>
-      <td>9.605149</td>
-      <td>7.532088</td>
-    </tr>
-    <tr>
-      <th>438</th>
-      <td>9.238928</td>
-      <td>7.591357</td>
-      <td>7.710653</td>
-      <td>6.945051</td>
-      <td>5.123964</td>
-      <td>7.661527</td>
-    </tr>
-    <tr>
-      <th>439</th>
-      <td>7.932721</td>
-      <td>7.437206</td>
-      <td>7.828038</td>
-      <td>4.174387</td>
-      <td>6.167516</td>
-      <td>3.951244</td>
+      <th>412</th>
+      <td>4.574711</td>
+      <td>8.190077</td>
+      <td>9.425452</td>
+      <td>4.584967</td>
+      <td>7.996317</td>
+      <td>4.127134</td>
     </tr>
   </tbody>
 </table>
-<p>422 rows × 6 columns</p>
 </div>
 </div>
 
@@ -13411,557 +13548,43 @@ O atributo está normalmente distribuido, tem como todos os demais uma mediana b
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>9.446913</td>
-      <td>9.175335</td>
-      <td>8.930759</td>
-      <td>5.365976</td>
-      <td>7.891331</td>
-      <td>7.198931</td>
+      <th>86</th>
+      <td>10.039983</td>
+      <td>11.205013</td>
+      <td>10.377047</td>
+      <td>6.894670</td>
+      <td>9.906981</td>
+      <td>6.805723</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>8.861775</td>
-      <td>9.191158</td>
-      <td>9.166179</td>
-      <td>7.474205</td>
-      <td>8.099554</td>
-      <td>7.482119</td>
+      <th>98</th>
+      <td>6.220590</td>
+      <td>4.718499</td>
+      <td>6.656727</td>
+      <td>6.796824</td>
+      <td>4.025352</td>
+      <td>4.882802</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>8.756682</td>
-      <td>9.083416</td>
-      <td>8.946896</td>
-      <td>7.785305</td>
-      <td>8.165079</td>
-      <td>8.967504</td>
+      <th>154</th>
+      <td>6.432940</td>
+      <td>4.007333</td>
+      <td>4.919981</td>
+      <td>4.317488</td>
+      <td>1.945910</td>
+      <td>2.079442</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>9.492884</td>
-      <td>7.086738</td>
-      <td>8.347827</td>
-      <td>8.764678</td>
-      <td>6.228511</td>
-      <td>7.488853</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>10.026369</td>
-      <td>8.596004</td>
-      <td>8.881558</td>
-      <td>8.272571</td>
-      <td>7.482682</td>
-      <td>8.553525</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>9.149847</td>
-      <td>9.019059</td>
-      <td>8.542081</td>
-      <td>6.501290</td>
-      <td>7.492760</td>
-      <td>7.280008</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>9.403107</td>
-      <td>8.070594</td>
-      <td>8.850088</td>
-      <td>6.173786</td>
-      <td>8.051978</td>
-      <td>6.300786</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>8.933137</td>
-      <td>8.508354</td>
-      <td>9.151227</td>
-      <td>7.419980</td>
-      <td>8.108021</td>
-      <td>7.850104</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>8.693329</td>
-      <td>8.201934</td>
-      <td>8.731013</td>
-      <td>6.052089</td>
-      <td>7.447751</td>
-      <td>6.620073</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>8.700514</td>
-      <td>9.314070</td>
-      <td>9.845911</td>
-      <td>7.055313</td>
-      <td>8.912608</td>
-      <td>7.648740</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>8.121480</td>
-      <td>8.594710</td>
-      <td>9.470703</td>
-      <td>8.389360</td>
-      <td>8.695674</td>
-      <td>7.463937</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>9.483873</td>
-      <td>7.024649</td>
-      <td>8.416931</td>
-      <td>7.258412</td>
-      <td>6.308098</td>
-      <td>6.208590</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>10.364514</td>
-      <td>9.418898</td>
-      <td>9.372204</td>
-      <td>5.659482</td>
-      <td>8.263848</td>
-      <td>7.983099</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>9.962558</td>
-      <td>8.733594</td>
-      <td>9.614605</td>
-      <td>8.037543</td>
-      <td>8.810907</td>
-      <td>6.400257</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>10.112654</td>
-      <td>9.155356</td>
-      <td>9.400217</td>
-      <td>5.683580</td>
-      <td>8.528726</td>
-      <td>7.681560</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>9.235326</td>
-      <td>7.015712</td>
-      <td>8.248267</td>
-      <td>5.983936</td>
-      <td>6.871091</td>
-      <td>6.021023</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>6.927558</td>
-      <td>9.084324</td>
-      <td>9.402695</td>
+      <th>356</th>
+      <td>10.029503</td>
       <td>4.897840</td>
-      <td>8.413609</td>
-      <td>6.984716</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>8.678632</td>
-      <td>8.725345</td>
-      <td>7.983781</td>
-      <td>6.732211</td>
-      <td>5.913503</td>
-      <td>8.406932</td>
-    </tr>
-    <tr>
-      <th>18</th>
-      <td>9.830971</td>
-      <td>8.752581</td>
-      <td>9.220192</td>
-      <td>7.698483</td>
-      <td>7.925519</td>
-      <td>8.064951</td>
-    </tr>
-    <tr>
-      <th>19</th>
-      <td>8.959312</td>
-      <td>7.822044</td>
-      <td>9.155250</td>
-      <td>6.505784</td>
-      <td>7.831220</td>
-      <td>6.216606</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>9.772581</td>
-      <td>8.416046</td>
-      <td>8.434246</td>
-      <td>6.971669</td>
-      <td>7.722678</td>
-      <td>7.661056</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>8.624612</td>
-      <td>6.769642</td>
-      <td>7.605890</td>
-      <td>8.126518</td>
-      <td>5.926926</td>
-      <td>6.343880</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>10.350606</td>
-      <td>7.558517</td>
-      <td>8.404920</td>
-      <td>9.149316</td>
-      <td>7.775276</td>
-      <td>8.374246</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>10.180096</td>
-      <td>10.502956</td>
-      <td>9.999661</td>
-      <td>8.547528</td>
-      <td>8.374938</td>
-      <td>9.712509</td>
-    </tr>
-    <tr>
-      <th>24</th>
-      <td>10.027783</td>
-      <td>9.187686</td>
-      <td>9.531844</td>
-      <td>7.977625</td>
-      <td>8.407825</td>
-      <td>8.661813</td>
-    </tr>
-    <tr>
-      <th>25</th>
-      <td>9.690604</td>
-      <td>8.349957</td>
-      <td>8.935245</td>
-      <td>5.303305</td>
-      <td>8.294799</td>
-      <td>4.043051</td>
-    </tr>
-    <tr>
-      <th>26</th>
-      <td>9.200088</td>
-      <td>6.867974</td>
-      <td>7.958926</td>
-      <td>8.055475</td>
-      <td>5.488938</td>
-      <td>6.725034</td>
-    </tr>
-    <tr>
-      <th>27</th>
-      <td>9.566335</td>
-      <td>6.688355</td>
-      <td>8.021256</td>
-      <td>6.184149</td>
-      <td>4.605170</td>
-      <td>6.249975</td>
-    </tr>
-    <tr>
-      <th>28</th>
-      <td>8.321908</td>
-      <td>9.927399</td>
-      <td>10.164197</td>
-      <td>7.054450</td>
-      <td>9.059982</td>
-      <td>8.557567</td>
-    </tr>
-    <tr>
-      <th>29</th>
-      <td>10.671000</td>
-      <td>7.649693</td>
-      <td>7.866722</td>
-      <td>7.090077</td>
-      <td>7.009409</td>
-      <td>6.712956</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>410</th>
-      <td>8.799812</td>
-      <td>7.647786</td>
-      <td>8.425736</td>
-      <td>7.236339</td>
-      <td>7.528332</td>
-      <td>7.545390</td>
-    </tr>
-    <tr>
-      <th>411</th>
-      <td>7.661998</td>
-      <td>8.098339</td>
-      <td>8.095904</td>
-      <td>7.336286</td>
-      <td>5.459586</td>
-      <td>8.381373</td>
-    </tr>
-    <tr>
-      <th>412</th>
-      <td>4.574711</td>
-      <td>8.190077</td>
-      <td>9.425452</td>
-      <td>4.584967</td>
-      <td>7.996317</td>
-      <td>4.127134</td>
-    </tr>
-    <tr>
-      <th>413</th>
-      <td>8.513787</td>
-      <td>8.488588</td>
-      <td>8.799812</td>
-      <td>9.790655</td>
-      <td>6.815640</td>
-      <td>7.797702</td>
-    </tr>
-    <tr>
-      <th>414</th>
-      <td>8.694335</td>
-      <td>7.595890</td>
-      <td>8.136518</td>
-      <td>8.644530</td>
-      <td>7.034388</td>
-      <td>5.669881</td>
-    </tr>
-    <tr>
-      <th>415</th>
-      <td>8.967249</td>
-      <td>8.707152</td>
-      <td>9.053920</td>
-      <td>7.433075</td>
-      <td>8.171882</td>
-      <td>7.535830</td>
-    </tr>
-    <tr>
-      <th>416</th>
-      <td>8.386857</td>
-      <td>9.300181</td>
-      <td>9.297252</td>
-      <td>6.742881</td>
-      <td>8.814033</td>
-      <td>6.900731</td>
-    </tr>
-    <tr>
-      <th>417</th>
-      <td>8.530109</td>
-      <td>8.612322</td>
-      <td>9.310638</td>
-      <td>5.897154</td>
-      <td>8.156223</td>
-      <td>6.968850</td>
-    </tr>
-    <tr>
-      <th>418</th>
-      <td>6.492240</td>
-      <td>9.047115</td>
-      <td>9.832099</td>
-      <td>4.890349</td>
-      <td>8.815815</td>
-      <td>6.654153</td>
-    </tr>
-    <tr>
-      <th>419</th>
-      <td>9.089415</td>
-      <td>8.238273</td>
-      <td>7.706613</td>
-      <td>6.450470</td>
-      <td>7.365180</td>
-      <td>7.327123</td>
-    </tr>
-    <tr>
-      <th>420</th>
-      <td>8.402007</td>
-      <td>8.569026</td>
-      <td>9.490015</td>
-      <td>3.218876</td>
-      <td>8.827321</td>
-      <td>7.239215</td>
-    </tr>
-    <tr>
-      <th>421</th>
-      <td>9.744668</td>
-      <td>8.486115</td>
-      <td>9.110851</td>
-      <td>6.938284</td>
-      <td>8.135933</td>
-      <td>7.486613</td>
-    </tr>
-    <tr>
-      <th>422</th>
-      <td>10.181119</td>
-      <td>7.227662</td>
-      <td>8.336151</td>
-      <td>6.721426</td>
-      <td>6.854355</td>
-      <td>7.104965</td>
-    </tr>
-    <tr>
-      <th>423</th>
-      <td>9.773664</td>
-      <td>8.212297</td>
-      <td>8.446127</td>
-      <td>6.965080</td>
-      <td>7.497207</td>
-      <td>6.504288</td>
-    </tr>
-    <tr>
-      <th>424</th>
-      <td>9.739791</td>
-      <td>7.966933</td>
-      <td>9.411811</td>
-      <td>6.773080</td>
-      <td>8.074960</td>
-      <td>5.517453</td>
-    </tr>
-    <tr>
-      <th>425</th>
-      <td>9.327501</td>
-      <td>7.786552</td>
-      <td>7.860571</td>
-      <td>9.638740</td>
-      <td>4.682131</td>
-      <td>7.542213</td>
-    </tr>
-    <tr>
-      <th>426</th>
-      <td>9.482960</td>
-      <td>9.142811</td>
-      <td>9.569133</td>
-      <td>8.052296</td>
-      <td>8.532870</td>
-      <td>7.546446</td>
-    </tr>
-    <tr>
-      <th>427</th>
-      <td>10.342130</td>
-      <td>9.722385</td>
-      <td>8.599510</td>
-      <td>9.621257</td>
-      <td>6.084499</td>
-      <td>7.058758</td>
-    </tr>
-    <tr>
-      <th>428</th>
-      <td>8.021913</td>
-      <td>8.694502</td>
-      <td>8.499029</td>
-      <td>7.695303</td>
-      <td>6.745236</td>
-      <td>5.758902</td>
-    </tr>
-    <tr>
-      <th>429</th>
-      <td>9.060331</td>
-      <td>7.467371</td>
-      <td>8.183118</td>
-      <td>3.850148</td>
-      <td>4.430817</td>
-      <td>7.824446</td>
-    </tr>
-    <tr>
-      <th>430</th>
-      <td>8.038189</td>
-      <td>8.349957</td>
-      <td>9.710085</td>
-      <td>6.354370</td>
-      <td>5.484797</td>
-      <td>7.640123</td>
-    </tr>
-    <tr>
-      <th>431</th>
-      <td>9.051696</td>
-      <td>8.613594</td>
-      <td>8.548692</td>
-      <td>9.509407</td>
-      <td>7.227662</td>
-      <td>7.311886</td>
-    </tr>
-    <tr>
-      <th>432</th>
-      <td>9.957834</td>
-      <td>7.057898</td>
-      <td>8.466742</td>
-      <td>5.594711</td>
-      <td>7.191429</td>
-      <td>5.978886</td>
-    </tr>
-    <tr>
-      <th>433</th>
-      <td>7.591862</td>
-      <td>8.076515</td>
-      <td>7.308543</td>
-      <td>7.340187</td>
-      <td>5.874931</td>
-      <td>7.278629</td>
-    </tr>
-    <tr>
-      <th>434</th>
-      <td>9.725019</td>
-      <td>8.274357</td>
-      <td>8.986447</td>
-      <td>6.533789</td>
-      <td>7.771067</td>
-      <td>6.731018</td>
-    </tr>
-    <tr>
-      <th>435</th>
-      <td>10.299003</td>
-      <td>9.396903</td>
-      <td>9.682030</td>
-      <td>9.483036</td>
-      <td>5.204007</td>
-      <td>7.698029</td>
-    </tr>
-    <tr>
-      <th>436</th>
-      <td>10.577146</td>
-      <td>7.266129</td>
-      <td>6.638568</td>
-      <td>8.414052</td>
-      <td>4.532599</td>
-      <td>7.760467</td>
-    </tr>
-    <tr>
-      <th>437</th>
-      <td>9.584040</td>
-      <td>9.647821</td>
-      <td>10.317020</td>
-      <td>6.079933</td>
-      <td>9.605149</td>
-      <td>7.532088</td>
-    </tr>
-    <tr>
-      <th>438</th>
-      <td>9.238928</td>
-      <td>7.591357</td>
-      <td>7.710653</td>
-      <td>6.945051</td>
-      <td>5.123964</td>
-      <td>7.661527</td>
-    </tr>
-    <tr>
-      <th>439</th>
-      <td>7.932721</td>
-      <td>7.437206</td>
-      <td>7.828038</td>
-      <td>4.174387</td>
-      <td>6.167516</td>
-      <td>3.951244</td>
+      <td>5.384495</td>
+      <td>8.057377</td>
+      <td>2.197225</td>
+      <td>6.306275</td>
     </tr>
   </tbody>
 </table>
-<p>422 rows × 6 columns</p>
 </div>
 </div>
 
@@ -14013,557 +13636,25 @@ O atributo está normalmente distribuido, tem como todos os demais uma mediana b
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>9.446913</td>
-      <td>9.175335</td>
-      <td>8.930759</td>
-      <td>5.365976</td>
-      <td>7.891331</td>
-      <td>7.198931</td>
+      <th>75</th>
+      <td>9.923192</td>
+      <td>7.036148</td>
+      <td>1.098612</td>
+      <td>8.390949</td>
+      <td>1.098612</td>
+      <td>6.882437</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>8.861775</td>
-      <td>9.191158</td>
-      <td>9.166179</td>
-      <td>7.474205</td>
-      <td>8.099554</td>
-      <td>7.482119</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>8.756682</td>
-      <td>9.083416</td>
-      <td>8.946896</td>
-      <td>7.785305</td>
-      <td>8.165079</td>
-      <td>8.967504</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>9.492884</td>
-      <td>7.086738</td>
-      <td>8.347827</td>
-      <td>8.764678</td>
-      <td>6.228511</td>
-      <td>7.488853</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>10.026369</td>
-      <td>8.596004</td>
-      <td>8.881558</td>
-      <td>8.272571</td>
-      <td>7.482682</td>
-      <td>8.553525</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>9.149847</td>
-      <td>9.019059</td>
-      <td>8.542081</td>
-      <td>6.501290</td>
-      <td>7.492760</td>
-      <td>7.280008</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>9.403107</td>
-      <td>8.070594</td>
-      <td>8.850088</td>
-      <td>6.173786</td>
-      <td>8.051978</td>
-      <td>6.300786</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>8.933137</td>
-      <td>8.508354</td>
-      <td>9.151227</td>
-      <td>7.419980</td>
-      <td>8.108021</td>
-      <td>7.850104</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>8.693329</td>
-      <td>8.201934</td>
-      <td>8.731013</td>
-      <td>6.052089</td>
-      <td>7.447751</td>
-      <td>6.620073</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>8.700514</td>
-      <td>9.314070</td>
-      <td>9.845911</td>
-      <td>7.055313</td>
-      <td>8.912608</td>
-      <td>7.648740</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>8.121480</td>
-      <td>8.594710</td>
-      <td>9.470703</td>
-      <td>8.389360</td>
-      <td>8.695674</td>
-      <td>7.463937</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>9.483873</td>
-      <td>7.024649</td>
-      <td>8.416931</td>
-      <td>7.258412</td>
-      <td>6.308098</td>
-      <td>6.208590</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>10.364514</td>
-      <td>9.418898</td>
-      <td>9.372204</td>
-      <td>5.659482</td>
-      <td>8.263848</td>
-      <td>7.983099</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>9.962558</td>
-      <td>8.733594</td>
-      <td>9.614605</td>
-      <td>8.037543</td>
-      <td>8.810907</td>
-      <td>6.400257</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>10.112654</td>
-      <td>9.155356</td>
-      <td>9.400217</td>
-      <td>5.683580</td>
-      <td>8.528726</td>
-      <td>7.681560</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>9.235326</td>
-      <td>7.015712</td>
-      <td>8.248267</td>
-      <td>5.983936</td>
-      <td>6.871091</td>
-      <td>6.021023</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>6.927558</td>
-      <td>9.084324</td>
-      <td>9.402695</td>
-      <td>4.897840</td>
-      <td>8.413609</td>
-      <td>6.984716</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>8.678632</td>
-      <td>8.725345</td>
-      <td>7.983781</td>
-      <td>6.732211</td>
-      <td>5.913503</td>
-      <td>8.406932</td>
-    </tr>
-    <tr>
-      <th>18</th>
-      <td>9.830971</td>
-      <td>8.752581</td>
-      <td>9.220192</td>
-      <td>7.698483</td>
-      <td>7.925519</td>
-      <td>8.064951</td>
-    </tr>
-    <tr>
-      <th>19</th>
-      <td>8.959312</td>
-      <td>7.822044</td>
-      <td>9.155250</td>
-      <td>6.505784</td>
-      <td>7.831220</td>
-      <td>6.216606</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>9.772581</td>
-      <td>8.416046</td>
-      <td>8.434246</td>
-      <td>6.971669</td>
-      <td>7.722678</td>
-      <td>7.661056</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>8.624612</td>
-      <td>6.769642</td>
-      <td>7.605890</td>
-      <td>8.126518</td>
-      <td>5.926926</td>
-      <td>6.343880</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>10.350606</td>
-      <td>7.558517</td>
-      <td>8.404920</td>
-      <td>9.149316</td>
-      <td>7.775276</td>
-      <td>8.374246</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>10.180096</td>
-      <td>10.502956</td>
-      <td>9.999661</td>
-      <td>8.547528</td>
-      <td>8.374938</td>
-      <td>9.712509</td>
-    </tr>
-    <tr>
-      <th>24</th>
-      <td>10.027783</td>
-      <td>9.187686</td>
-      <td>9.531844</td>
-      <td>7.977625</td>
-      <td>8.407825</td>
-      <td>8.661813</td>
-    </tr>
-    <tr>
-      <th>25</th>
-      <td>9.690604</td>
-      <td>8.349957</td>
-      <td>8.935245</td>
-      <td>5.303305</td>
-      <td>8.294799</td>
-      <td>4.043051</td>
-    </tr>
-    <tr>
-      <th>26</th>
-      <td>9.200088</td>
-      <td>6.867974</td>
-      <td>7.958926</td>
-      <td>8.055475</td>
-      <td>5.488938</td>
-      <td>6.725034</td>
-    </tr>
-    <tr>
-      <th>27</th>
-      <td>9.566335</td>
-      <td>6.688355</td>
-      <td>8.021256</td>
-      <td>6.184149</td>
-      <td>4.605170</td>
-      <td>6.249975</td>
-    </tr>
-    <tr>
-      <th>28</th>
-      <td>8.321908</td>
-      <td>9.927399</td>
-      <td>10.164197</td>
-      <td>7.054450</td>
-      <td>9.059982</td>
-      <td>8.557567</td>
-    </tr>
-    <tr>
-      <th>29</th>
-      <td>10.671000</td>
-      <td>7.649693</td>
-      <td>7.866722</td>
-      <td>7.090077</td>
-      <td>7.009409</td>
-      <td>6.712956</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>410</th>
-      <td>8.799812</td>
-      <td>7.647786</td>
-      <td>8.425736</td>
-      <td>7.236339</td>
-      <td>7.528332</td>
-      <td>7.545390</td>
-    </tr>
-    <tr>
-      <th>411</th>
-      <td>7.661998</td>
-      <td>8.098339</td>
-      <td>8.095904</td>
-      <td>7.336286</td>
-      <td>5.459586</td>
-      <td>8.381373</td>
-    </tr>
-    <tr>
-      <th>412</th>
-      <td>4.574711</td>
-      <td>8.190077</td>
-      <td>9.425452</td>
-      <td>4.584967</td>
-      <td>7.996317</td>
-      <td>4.127134</td>
-    </tr>
-    <tr>
-      <th>413</th>
-      <td>8.513787</td>
-      <td>8.488588</td>
-      <td>8.799812</td>
-      <td>9.790655</td>
-      <td>6.815640</td>
-      <td>7.797702</td>
-    </tr>
-    <tr>
-      <th>414</th>
-      <td>8.694335</td>
-      <td>7.595890</td>
-      <td>8.136518</td>
-      <td>8.644530</td>
-      <td>7.034388</td>
-      <td>5.669881</td>
-    </tr>
-    <tr>
-      <th>415</th>
-      <td>8.967249</td>
-      <td>8.707152</td>
-      <td>9.053920</td>
-      <td>7.433075</td>
-      <td>8.171882</td>
-      <td>7.535830</td>
-    </tr>
-    <tr>
-      <th>416</th>
-      <td>8.386857</td>
-      <td>9.300181</td>
-      <td>9.297252</td>
-      <td>6.742881</td>
-      <td>8.814033</td>
-      <td>6.900731</td>
-    </tr>
-    <tr>
-      <th>417</th>
-      <td>8.530109</td>
-      <td>8.612322</td>
-      <td>9.310638</td>
-      <td>5.897154</td>
-      <td>8.156223</td>
-      <td>6.968850</td>
-    </tr>
-    <tr>
-      <th>418</th>
-      <td>6.492240</td>
-      <td>9.047115</td>
-      <td>9.832099</td>
-      <td>4.890349</td>
-      <td>8.815815</td>
-      <td>6.654153</td>
-    </tr>
-    <tr>
-      <th>419</th>
-      <td>9.089415</td>
-      <td>8.238273</td>
-      <td>7.706613</td>
-      <td>6.450470</td>
-      <td>7.365180</td>
-      <td>7.327123</td>
-    </tr>
-    <tr>
-      <th>420</th>
-      <td>8.402007</td>
-      <td>8.569026</td>
-      <td>9.490015</td>
-      <td>3.218876</td>
-      <td>8.827321</td>
-      <td>7.239215</td>
-    </tr>
-    <tr>
-      <th>421</th>
-      <td>9.744668</td>
-      <td>8.486115</td>
-      <td>9.110851</td>
-      <td>6.938284</td>
-      <td>8.135933</td>
-      <td>7.486613</td>
-    </tr>
-    <tr>
-      <th>422</th>
-      <td>10.181119</td>
-      <td>7.227662</td>
-      <td>8.336151</td>
-      <td>6.721426</td>
-      <td>6.854355</td>
-      <td>7.104965</td>
-    </tr>
-    <tr>
-      <th>423</th>
-      <td>9.773664</td>
-      <td>8.212297</td>
-      <td>8.446127</td>
-      <td>6.965080</td>
-      <td>7.497207</td>
-      <td>6.504288</td>
-    </tr>
-    <tr>
-      <th>424</th>
-      <td>9.739791</td>
-      <td>7.966933</td>
-      <td>9.411811</td>
-      <td>6.773080</td>
-      <td>8.074960</td>
-      <td>5.517453</td>
-    </tr>
-    <tr>
-      <th>425</th>
-      <td>9.327501</td>
-      <td>7.786552</td>
-      <td>7.860571</td>
-      <td>9.638740</td>
-      <td>4.682131</td>
-      <td>7.542213</td>
-    </tr>
-    <tr>
-      <th>426</th>
-      <td>9.482960</td>
-      <td>9.142811</td>
-      <td>9.569133</td>
-      <td>8.052296</td>
-      <td>8.532870</td>
-      <td>7.546446</td>
-    </tr>
-    <tr>
-      <th>427</th>
-      <td>10.342130</td>
-      <td>9.722385</td>
-      <td>8.599510</td>
-      <td>9.621257</td>
-      <td>6.084499</td>
-      <td>7.058758</td>
-    </tr>
-    <tr>
-      <th>428</th>
-      <td>8.021913</td>
-      <td>8.694502</td>
-      <td>8.499029</td>
-      <td>7.695303</td>
-      <td>6.745236</td>
-      <td>5.758902</td>
-    </tr>
-    <tr>
-      <th>429</th>
-      <td>9.060331</td>
-      <td>7.467371</td>
-      <td>8.183118</td>
-      <td>3.850148</td>
-      <td>4.430817</td>
-      <td>7.824446</td>
-    </tr>
-    <tr>
-      <th>430</th>
-      <td>8.038189</td>
-      <td>8.349957</td>
-      <td>9.710085</td>
-      <td>6.354370</td>
-      <td>5.484797</td>
-      <td>7.640123</td>
-    </tr>
-    <tr>
-      <th>431</th>
-      <td>9.051696</td>
-      <td>8.613594</td>
-      <td>8.548692</td>
-      <td>9.509407</td>
-      <td>7.227662</td>
-      <td>7.311886</td>
-    </tr>
-    <tr>
-      <th>432</th>
-      <td>9.957834</td>
-      <td>7.057898</td>
-      <td>8.466742</td>
-      <td>5.594711</td>
-      <td>7.191429</td>
-      <td>5.978886</td>
-    </tr>
-    <tr>
-      <th>433</th>
-      <td>7.591862</td>
-      <td>8.076515</td>
-      <td>7.308543</td>
-      <td>7.340187</td>
-      <td>5.874931</td>
-      <td>7.278629</td>
-    </tr>
-    <tr>
-      <th>434</th>
-      <td>9.725019</td>
-      <td>8.274357</td>
-      <td>8.986447</td>
-      <td>6.533789</td>
-      <td>7.771067</td>
-      <td>6.731018</td>
-    </tr>
-    <tr>
-      <th>435</th>
-      <td>10.299003</td>
-      <td>9.396903</td>
-      <td>9.682030</td>
-      <td>9.483036</td>
-      <td>5.204007</td>
-      <td>7.698029</td>
-    </tr>
-    <tr>
-      <th>436</th>
-      <td>10.577146</td>
-      <td>7.266129</td>
-      <td>6.638568</td>
-      <td>8.414052</td>
-      <td>4.532599</td>
-      <td>7.760467</td>
-    </tr>
-    <tr>
-      <th>437</th>
-      <td>9.584040</td>
-      <td>9.647821</td>
-      <td>10.317020</td>
-      <td>6.079933</td>
-      <td>9.605149</td>
-      <td>7.532088</td>
-    </tr>
-    <tr>
-      <th>438</th>
-      <td>9.238928</td>
-      <td>7.591357</td>
-      <td>7.710653</td>
-      <td>6.945051</td>
-      <td>5.123964</td>
-      <td>7.661527</td>
-    </tr>
-    <tr>
-      <th>439</th>
-      <td>7.932721</td>
-      <td>7.437206</td>
-      <td>7.828038</td>
-      <td>4.174387</td>
-      <td>6.167516</td>
-      <td>3.951244</td>
+      <th>154</th>
+      <td>6.432940</td>
+      <td>4.007333</td>
+      <td>4.919981</td>
+      <td>4.317488</td>
+      <td>1.945910</td>
+      <td>2.079442</td>
     </tr>
   </tbody>
 </table>
-<p>434 rows × 6 columns</p>
 </div>
 </div>
 
@@ -14615,382 +13706,67 @@ O atributo está normalmente distribuido, tem como todos os demais uma mediana b
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>9.446913</td>
-      <td>9.175335</td>
-      <td>8.930759</td>
-      <td>5.365976</td>
-      <td>7.891331</td>
-      <td>7.198931</td>
+      <th>38</th>
+      <td>8.431853</td>
+      <td>9.663261</td>
+      <td>9.723703</td>
+      <td>3.496508</td>
+      <td>8.847360</td>
+      <td>6.070738</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>8.861775</td>
-      <td>9.191158</td>
-      <td>9.166179</td>
-      <td>7.474205</td>
-      <td>8.099554</td>
-      <td>7.482119</td>
+      <th>57</th>
+      <td>8.597297</td>
+      <td>9.203618</td>
+      <td>9.257892</td>
+      <td>3.637586</td>
+      <td>8.932213</td>
+      <td>7.156177</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>8.756682</td>
-      <td>9.083416</td>
-      <td>8.946896</td>
-      <td>7.785305</td>
-      <td>8.165079</td>
-      <td>8.967504</td>
+      <th>65</th>
+      <td>4.442651</td>
+      <td>9.950323</td>
+      <td>10.732651</td>
+      <td>3.583519</td>
+      <td>10.095388</td>
+      <td>7.260523</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>9.492884</td>
-      <td>7.086738</td>
-      <td>8.347827</td>
-      <td>8.764678</td>
-      <td>6.228511</td>
-      <td>7.488853</td>
+      <th>145</th>
+      <td>10.000569</td>
+      <td>9.034080</td>
+      <td>10.457143</td>
+      <td>3.737670</td>
+      <td>9.440738</td>
+      <td>8.396155</td>
     </tr>
     <tr>
-      <th>4</th>
-      <td>10.026369</td>
-      <td>8.596004</td>
-      <td>8.881558</td>
-      <td>8.272571</td>
-      <td>7.482682</td>
-      <td>8.553525</td>
+      <th>175</th>
+      <td>7.759187</td>
+      <td>8.967632</td>
+      <td>9.382106</td>
+      <td>3.951244</td>
+      <td>8.341887</td>
+      <td>7.436617</td>
     </tr>
     <tr>
-      <th>5</th>
-      <td>9.149847</td>
-      <td>9.019059</td>
-      <td>8.542081</td>
-      <td>6.501290</td>
-      <td>7.492760</td>
-      <td>7.280008</td>
+      <th>264</th>
+      <td>6.978214</td>
+      <td>9.177714</td>
+      <td>9.645041</td>
+      <td>4.110874</td>
+      <td>8.696176</td>
+      <td>7.142827</td>
     </tr>
     <tr>
-      <th>6</th>
-      <td>9.403107</td>
-      <td>8.070594</td>
-      <td>8.850088</td>
-      <td>6.173786</td>
-      <td>8.051978</td>
-      <td>6.300786</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>8.933137</td>
-      <td>8.508354</td>
-      <td>9.151227</td>
-      <td>7.419980</td>
-      <td>8.108021</td>
-      <td>7.850104</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>8.693329</td>
-      <td>8.201934</td>
-      <td>8.731013</td>
-      <td>6.052089</td>
-      <td>7.447751</td>
-      <td>6.620073</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>8.700514</td>
-      <td>9.314070</td>
-      <td>9.845911</td>
-      <td>7.055313</td>
-      <td>8.912608</td>
-      <td>7.648740</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>8.121480</td>
-      <td>8.594710</td>
-      <td>9.470703</td>
-      <td>8.389360</td>
-      <td>8.695674</td>
-      <td>7.463937</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>9.483873</td>
-      <td>7.024649</td>
-      <td>8.416931</td>
-      <td>7.258412</td>
-      <td>6.308098</td>
-      <td>6.208590</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>10.364514</td>
-      <td>9.418898</td>
-      <td>9.372204</td>
-      <td>5.659482</td>
-      <td>8.263848</td>
-      <td>7.983099</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>9.962558</td>
-      <td>8.733594</td>
-      <td>9.614605</td>
-      <td>8.037543</td>
-      <td>8.810907</td>
-      <td>6.400257</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>10.112654</td>
-      <td>9.155356</td>
-      <td>9.400217</td>
-      <td>5.683580</td>
-      <td>8.528726</td>
-      <td>7.681560</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>9.235326</td>
-      <td>7.015712</td>
-      <td>8.248267</td>
-      <td>5.983936</td>
-      <td>6.871091</td>
-      <td>6.021023</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>6.927558</td>
-      <td>9.084324</td>
-      <td>9.402695</td>
-      <td>4.897840</td>
-      <td>8.413609</td>
-      <td>6.984716</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>8.678632</td>
-      <td>8.725345</td>
-      <td>7.983781</td>
-      <td>6.732211</td>
-      <td>5.913503</td>
-      <td>8.406932</td>
-    </tr>
-    <tr>
-      <th>18</th>
-      <td>9.830971</td>
-      <td>8.752581</td>
-      <td>9.220192</td>
-      <td>7.698483</td>
-      <td>7.925519</td>
-      <td>8.064951</td>
-    </tr>
-    <tr>
-      <th>19</th>
-      <td>8.959312</td>
-      <td>7.822044</td>
-      <td>9.155250</td>
-      <td>6.505784</td>
-      <td>7.831220</td>
-      <td>6.216606</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>9.772581</td>
-      <td>8.416046</td>
-      <td>8.434246</td>
-      <td>6.971669</td>
-      <td>7.722678</td>
-      <td>7.661056</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>8.624612</td>
-      <td>6.769642</td>
-      <td>7.605890</td>
-      <td>8.126518</td>
-      <td>5.926926</td>
-      <td>6.343880</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>10.350606</td>
-      <td>7.558517</td>
-      <td>8.404920</td>
-      <td>9.149316</td>
-      <td>7.775276</td>
-      <td>8.374246</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>10.180096</td>
-      <td>10.502956</td>
-      <td>9.999661</td>
-      <td>8.547528</td>
-      <td>8.374938</td>
-      <td>9.712509</td>
-    </tr>
-    <tr>
-      <th>24</th>
-      <td>10.027783</td>
-      <td>9.187686</td>
-      <td>9.531844</td>
-      <td>7.977625</td>
-      <td>8.407825</td>
-      <td>8.661813</td>
-    </tr>
-    <tr>
-      <th>25</th>
-      <td>9.690604</td>
-      <td>8.349957</td>
-      <td>8.935245</td>
-      <td>5.303305</td>
-      <td>8.294799</td>
-      <td>4.043051</td>
-    </tr>
-    <tr>
-      <th>26</th>
-      <td>9.200088</td>
-      <td>6.867974</td>
-      <td>7.958926</td>
-      <td>8.055475</td>
-      <td>5.488938</td>
-      <td>6.725034</td>
-    </tr>
-    <tr>
-      <th>27</th>
-      <td>9.566335</td>
-      <td>6.688355</td>
-      <td>8.021256</td>
-      <td>6.184149</td>
-      <td>4.605170</td>
-      <td>6.249975</td>
-    </tr>
-    <tr>
-      <th>28</th>
-      <td>8.321908</td>
-      <td>9.927399</td>
-      <td>10.164197</td>
-      <td>7.054450</td>
-      <td>9.059982</td>
-      <td>8.557567</td>
-    </tr>
-    <tr>
-      <th>29</th>
-      <td>10.671000</td>
-      <td>7.649693</td>
-      <td>7.866722</td>
-      <td>7.090077</td>
-      <td>7.009409</td>
-      <td>6.712956</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>409</th>
-      <td>9.071997</td>
-      <td>8.198089</td>
-      <td>8.716044</td>
-      <td>7.761745</td>
-      <td>7.660585</td>
-      <td>8.544225</td>
-    </tr>
-    <tr>
-      <th>410</th>
-      <td>8.799812</td>
-      <td>7.647786</td>
-      <td>8.425736</td>
-      <td>7.236339</td>
-      <td>7.528332</td>
-      <td>7.545390</td>
-    </tr>
-    <tr>
-      <th>411</th>
-      <td>7.661998</td>
-      <td>8.098339</td>
-      <td>8.095904</td>
-      <td>7.336286</td>
-      <td>5.459586</td>
-      <td>8.381373</td>
-    </tr>
-    <tr>
-      <th>412</th>
-      <td>4.574711</td>
-      <td>8.190077</td>
-      <td>9.425452</td>
-      <td>4.584967</td>
-      <td>7.996317</td>
-      <td>4.127134</td>
-    </tr>
-    <tr>
-      <th>413</th>
-      <td>8.513787</td>
-      <td>8.488588</td>
-      <td>8.799812</td>
-      <td>9.790655</td>
-      <td>6.815640</td>
-      <td>7.797702</td>
-    </tr>
-    <tr>
-      <th>414</th>
-      <td>8.694335</td>
-      <td>7.595890</td>
-      <td>8.136518</td>
-      <td>8.644530</td>
-      <td>7.034388</td>
-      <td>5.669881</td>
-    </tr>
-    <tr>
-      <th>415</th>
-      <td>8.967249</td>
-      <td>8.707152</td>
-      <td>9.053920</td>
-      <td>7.433075</td>
-      <td>8.171882</td>
-      <td>7.535830</td>
-    </tr>
-    <tr>
-      <th>416</th>
-      <td>8.386857</td>
-      <td>9.300181</td>
-      <td>9.297252</td>
-      <td>6.742881</td>
-      <td>8.814033</td>
-      <td>6.900731</td>
-    </tr>
-    <tr>
-      <th>417</th>
-      <td>8.530109</td>
-      <td>8.612322</td>
-      <td>9.310638</td>
-      <td>5.897154</td>
-      <td>8.156223</td>
-      <td>6.968850</td>
-    </tr>
-    <tr>
-      <th>418</th>
-      <td>6.492240</td>
-      <td>9.047115</td>
-      <td>9.832099</td>
-      <td>4.890349</td>
-      <td>8.815815</td>
-      <td>6.654153</td>
-    </tr>
-    <tr>
-      <th>419</th>
-      <td>9.089415</td>
-      <td>8.238273</td>
-      <td>7.706613</td>
-      <td>6.450470</td>
-      <td>7.365180</td>
-      <td>7.327123</td>
+      <th>325</th>
+      <td>10.395650</td>
+      <td>9.728181</td>
+      <td>9.519735</td>
+      <td>11.016479</td>
+      <td>7.148346</td>
+      <td>8.632128</td>
     </tr>
     <tr>
       <th>420</th>
@@ -15002,157 +13778,13 @@ O atributo está normalmente distribuido, tem como todos os demais uma mediana b
       <td>7.239215</td>
     </tr>
     <tr>
-      <th>421</th>
-      <td>9.744668</td>
-      <td>8.486115</td>
-      <td>9.110851</td>
-      <td>6.938284</td>
-      <td>8.135933</td>
-      <td>7.486613</td>
-    </tr>
-    <tr>
-      <th>422</th>
-      <td>10.181119</td>
-      <td>7.227662</td>
-      <td>8.336151</td>
-      <td>6.721426</td>
-      <td>6.854355</td>
-      <td>7.104965</td>
-    </tr>
-    <tr>
-      <th>423</th>
-      <td>9.773664</td>
-      <td>8.212297</td>
-      <td>8.446127</td>
-      <td>6.965080</td>
-      <td>7.497207</td>
-      <td>6.504288</td>
-    </tr>
-    <tr>
-      <th>424</th>
-      <td>9.739791</td>
-      <td>7.966933</td>
-      <td>9.411811</td>
-      <td>6.773080</td>
-      <td>8.074960</td>
-      <td>5.517453</td>
-    </tr>
-    <tr>
-      <th>425</th>
-      <td>9.327501</td>
-      <td>7.786552</td>
-      <td>7.860571</td>
-      <td>9.638740</td>
-      <td>4.682131</td>
-      <td>7.542213</td>
-    </tr>
-    <tr>
-      <th>426</th>
-      <td>9.482960</td>
-      <td>9.142811</td>
-      <td>9.569133</td>
-      <td>8.052296</td>
-      <td>8.532870</td>
-      <td>7.546446</td>
-    </tr>
-    <tr>
-      <th>427</th>
-      <td>10.342130</td>
-      <td>9.722385</td>
-      <td>8.599510</td>
-      <td>9.621257</td>
-      <td>6.084499</td>
-      <td>7.058758</td>
-    </tr>
-    <tr>
-      <th>428</th>
-      <td>8.021913</td>
-      <td>8.694502</td>
-      <td>8.499029</td>
-      <td>7.695303</td>
-      <td>6.745236</td>
-      <td>5.758902</td>
-    </tr>
-    <tr>
-      <th>430</th>
-      <td>8.038189</td>
-      <td>8.349957</td>
-      <td>9.710085</td>
-      <td>6.354370</td>
-      <td>5.484797</td>
-      <td>7.640123</td>
-    </tr>
-    <tr>
-      <th>431</th>
-      <td>9.051696</td>
-      <td>8.613594</td>
-      <td>8.548692</td>
-      <td>9.509407</td>
-      <td>7.227662</td>
-      <td>7.311886</td>
-    </tr>
-    <tr>
-      <th>432</th>
-      <td>9.957834</td>
-      <td>7.057898</td>
-      <td>8.466742</td>
-      <td>5.594711</td>
-      <td>7.191429</td>
-      <td>5.978886</td>
-    </tr>
-    <tr>
-      <th>433</th>
-      <td>7.591862</td>
-      <td>8.076515</td>
-      <td>7.308543</td>
-      <td>7.340187</td>
-      <td>5.874931</td>
-      <td>7.278629</td>
-    </tr>
-    <tr>
-      <th>434</th>
-      <td>9.725019</td>
-      <td>8.274357</td>
-      <td>8.986447</td>
-      <td>6.533789</td>
-      <td>7.771067</td>
-      <td>6.731018</td>
-    </tr>
-    <tr>
-      <th>435</th>
-      <td>10.299003</td>
-      <td>9.396903</td>
-      <td>9.682030</td>
-      <td>9.483036</td>
-      <td>5.204007</td>
-      <td>7.698029</td>
-    </tr>
-    <tr>
-      <th>436</th>
-      <td>10.577146</td>
-      <td>7.266129</td>
-      <td>6.638568</td>
-      <td>8.414052</td>
-      <td>4.532599</td>
-      <td>7.760467</td>
-    </tr>
-    <tr>
-      <th>437</th>
-      <td>9.584040</td>
-      <td>9.647821</td>
-      <td>10.317020</td>
-      <td>6.079933</td>
-      <td>9.605149</td>
-      <td>7.532088</td>
-    </tr>
-    <tr>
-      <th>438</th>
-      <td>9.238928</td>
-      <td>7.591357</td>
-      <td>7.710653</td>
-      <td>6.945051</td>
-      <td>5.123964</td>
-      <td>7.661527</td>
+      <th>429</th>
+      <td>9.060331</td>
+      <td>7.467371</td>
+      <td>8.183118</td>
+      <td>3.850148</td>
+      <td>4.430817</td>
+      <td>7.824446</td>
     </tr>
     <tr>
       <th>439</th>
@@ -15165,7 +13797,6 @@ O atributo está normalmente distribuido, tem como todos os demais uma mediana b
     </tr>
   </tbody>
 </table>
-<p>435 rows × 6 columns</p>
 </div>
 </div>
 
@@ -15217,557 +13848,25 @@ O atributo está normalmente distribuido, tem como todos os demais uma mediana b
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>9.446913</td>
-      <td>9.175335</td>
-      <td>8.930759</td>
-      <td>5.365976</td>
-      <td>7.891331</td>
-      <td>7.198931</td>
+      <th>75</th>
+      <td>9.923192</td>
+      <td>7.036148</td>
+      <td>1.098612</td>
+      <td>8.390949</td>
+      <td>1.098612</td>
+      <td>6.882437</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>8.861775</td>
-      <td>9.191158</td>
-      <td>9.166179</td>
-      <td>7.474205</td>
-      <td>8.099554</td>
-      <td>7.482119</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>8.756682</td>
-      <td>9.083416</td>
-      <td>8.946896</td>
-      <td>7.785305</td>
-      <td>8.165079</td>
-      <td>8.967504</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>9.492884</td>
-      <td>7.086738</td>
-      <td>8.347827</td>
-      <td>8.764678</td>
-      <td>6.228511</td>
-      <td>7.488853</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>10.026369</td>
-      <td>8.596004</td>
-      <td>8.881558</td>
-      <td>8.272571</td>
-      <td>7.482682</td>
-      <td>8.553525</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>9.149847</td>
-      <td>9.019059</td>
-      <td>8.542081</td>
-      <td>6.501290</td>
-      <td>7.492760</td>
-      <td>7.280008</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>9.403107</td>
-      <td>8.070594</td>
-      <td>8.850088</td>
-      <td>6.173786</td>
-      <td>8.051978</td>
-      <td>6.300786</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>8.933137</td>
-      <td>8.508354</td>
-      <td>9.151227</td>
-      <td>7.419980</td>
-      <td>8.108021</td>
-      <td>7.850104</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>8.693329</td>
-      <td>8.201934</td>
-      <td>8.731013</td>
-      <td>6.052089</td>
-      <td>7.447751</td>
-      <td>6.620073</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>8.700514</td>
-      <td>9.314070</td>
-      <td>9.845911</td>
-      <td>7.055313</td>
-      <td>8.912608</td>
-      <td>7.648740</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>8.121480</td>
-      <td>8.594710</td>
-      <td>9.470703</td>
-      <td>8.389360</td>
-      <td>8.695674</td>
-      <td>7.463937</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>9.483873</td>
-      <td>7.024649</td>
-      <td>8.416931</td>
-      <td>7.258412</td>
-      <td>6.308098</td>
-      <td>6.208590</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>10.364514</td>
-      <td>9.418898</td>
-      <td>9.372204</td>
-      <td>5.659482</td>
-      <td>8.263848</td>
-      <td>7.983099</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>9.962558</td>
-      <td>8.733594</td>
-      <td>9.614605</td>
-      <td>8.037543</td>
-      <td>8.810907</td>
-      <td>6.400257</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>10.112654</td>
-      <td>9.155356</td>
-      <td>9.400217</td>
-      <td>5.683580</td>
-      <td>8.528726</td>
-      <td>7.681560</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>9.235326</td>
-      <td>7.015712</td>
-      <td>8.248267</td>
-      <td>5.983936</td>
-      <td>6.871091</td>
-      <td>6.021023</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>6.927558</td>
-      <td>9.084324</td>
-      <td>9.402695</td>
-      <td>4.897840</td>
-      <td>8.413609</td>
-      <td>6.984716</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>8.678632</td>
-      <td>8.725345</td>
-      <td>7.983781</td>
-      <td>6.732211</td>
-      <td>5.913503</td>
-      <td>8.406932</td>
-    </tr>
-    <tr>
-      <th>18</th>
-      <td>9.830971</td>
-      <td>8.752581</td>
-      <td>9.220192</td>
-      <td>7.698483</td>
-      <td>7.925519</td>
-      <td>8.064951</td>
-    </tr>
-    <tr>
-      <th>19</th>
-      <td>8.959312</td>
-      <td>7.822044</td>
-      <td>9.155250</td>
-      <td>6.505784</td>
-      <td>7.831220</td>
-      <td>6.216606</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>9.772581</td>
-      <td>8.416046</td>
-      <td>8.434246</td>
-      <td>6.971669</td>
-      <td>7.722678</td>
-      <td>7.661056</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>8.624612</td>
-      <td>6.769642</td>
-      <td>7.605890</td>
-      <td>8.126518</td>
-      <td>5.926926</td>
-      <td>6.343880</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>10.350606</td>
-      <td>7.558517</td>
-      <td>8.404920</td>
-      <td>9.149316</td>
-      <td>7.775276</td>
-      <td>8.374246</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>10.180096</td>
-      <td>10.502956</td>
-      <td>9.999661</td>
-      <td>8.547528</td>
-      <td>8.374938</td>
-      <td>9.712509</td>
-    </tr>
-    <tr>
-      <th>24</th>
-      <td>10.027783</td>
-      <td>9.187686</td>
-      <td>9.531844</td>
-      <td>7.977625</td>
-      <td>8.407825</td>
-      <td>8.661813</td>
-    </tr>
-    <tr>
-      <th>25</th>
-      <td>9.690604</td>
-      <td>8.349957</td>
-      <td>8.935245</td>
-      <td>5.303305</td>
-      <td>8.294799</td>
-      <td>4.043051</td>
-    </tr>
-    <tr>
-      <th>26</th>
-      <td>9.200088</td>
-      <td>6.867974</td>
-      <td>7.958926</td>
-      <td>8.055475</td>
-      <td>5.488938</td>
-      <td>6.725034</td>
-    </tr>
-    <tr>
-      <th>27</th>
-      <td>9.566335</td>
-      <td>6.688355</td>
-      <td>8.021256</td>
-      <td>6.184149</td>
-      <td>4.605170</td>
-      <td>6.249975</td>
-    </tr>
-    <tr>
-      <th>28</th>
-      <td>8.321908</td>
-      <td>9.927399</td>
-      <td>10.164197</td>
-      <td>7.054450</td>
-      <td>9.059982</td>
-      <td>8.557567</td>
-    </tr>
-    <tr>
-      <th>29</th>
-      <td>10.671000</td>
-      <td>7.649693</td>
-      <td>7.866722</td>
-      <td>7.090077</td>
-      <td>7.009409</td>
-      <td>6.712956</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>410</th>
-      <td>8.799812</td>
-      <td>7.647786</td>
-      <td>8.425736</td>
-      <td>7.236339</td>
-      <td>7.528332</td>
-      <td>7.545390</td>
-    </tr>
-    <tr>
-      <th>411</th>
-      <td>7.661998</td>
-      <td>8.098339</td>
-      <td>8.095904</td>
-      <td>7.336286</td>
-      <td>5.459586</td>
-      <td>8.381373</td>
-    </tr>
-    <tr>
-      <th>412</th>
-      <td>4.574711</td>
-      <td>8.190077</td>
-      <td>9.425452</td>
-      <td>4.584967</td>
-      <td>7.996317</td>
-      <td>4.127134</td>
-    </tr>
-    <tr>
-      <th>413</th>
-      <td>8.513787</td>
-      <td>8.488588</td>
-      <td>8.799812</td>
-      <td>9.790655</td>
-      <td>6.815640</td>
-      <td>7.797702</td>
-    </tr>
-    <tr>
-      <th>414</th>
-      <td>8.694335</td>
-      <td>7.595890</td>
-      <td>8.136518</td>
-      <td>8.644530</td>
-      <td>7.034388</td>
-      <td>5.669881</td>
-    </tr>
-    <tr>
-      <th>415</th>
-      <td>8.967249</td>
-      <td>8.707152</td>
-      <td>9.053920</td>
-      <td>7.433075</td>
-      <td>8.171882</td>
-      <td>7.535830</td>
-    </tr>
-    <tr>
-      <th>416</th>
-      <td>8.386857</td>
-      <td>9.300181</td>
-      <td>9.297252</td>
-      <td>6.742881</td>
-      <td>8.814033</td>
-      <td>6.900731</td>
-    </tr>
-    <tr>
-      <th>417</th>
-      <td>8.530109</td>
-      <td>8.612322</td>
-      <td>9.310638</td>
-      <td>5.897154</td>
-      <td>8.156223</td>
-      <td>6.968850</td>
-    </tr>
-    <tr>
-      <th>418</th>
-      <td>6.492240</td>
-      <td>9.047115</td>
-      <td>9.832099</td>
-      <td>4.890349</td>
-      <td>8.815815</td>
-      <td>6.654153</td>
-    </tr>
-    <tr>
-      <th>419</th>
-      <td>9.089415</td>
-      <td>8.238273</td>
-      <td>7.706613</td>
-      <td>6.450470</td>
-      <td>7.365180</td>
-      <td>7.327123</td>
-    </tr>
-    <tr>
-      <th>420</th>
-      <td>8.402007</td>
-      <td>8.569026</td>
-      <td>9.490015</td>
-      <td>3.218876</td>
-      <td>8.827321</td>
-      <td>7.239215</td>
-    </tr>
-    <tr>
-      <th>421</th>
-      <td>9.744668</td>
-      <td>8.486115</td>
-      <td>9.110851</td>
-      <td>6.938284</td>
-      <td>8.135933</td>
-      <td>7.486613</td>
-    </tr>
-    <tr>
-      <th>422</th>
-      <td>10.181119</td>
-      <td>7.227662</td>
-      <td>8.336151</td>
-      <td>6.721426</td>
-      <td>6.854355</td>
-      <td>7.104965</td>
-    </tr>
-    <tr>
-      <th>423</th>
-      <td>9.773664</td>
-      <td>8.212297</td>
-      <td>8.446127</td>
-      <td>6.965080</td>
-      <td>7.497207</td>
-      <td>6.504288</td>
-    </tr>
-    <tr>
-      <th>424</th>
-      <td>9.739791</td>
-      <td>7.966933</td>
-      <td>9.411811</td>
-      <td>6.773080</td>
-      <td>8.074960</td>
-      <td>5.517453</td>
-    </tr>
-    <tr>
-      <th>425</th>
-      <td>9.327501</td>
-      <td>7.786552</td>
-      <td>7.860571</td>
-      <td>9.638740</td>
-      <td>4.682131</td>
-      <td>7.542213</td>
-    </tr>
-    <tr>
-      <th>426</th>
-      <td>9.482960</td>
-      <td>9.142811</td>
-      <td>9.569133</td>
-      <td>8.052296</td>
-      <td>8.532870</td>
-      <td>7.546446</td>
-    </tr>
-    <tr>
-      <th>427</th>
-      <td>10.342130</td>
-      <td>9.722385</td>
-      <td>8.599510</td>
-      <td>9.621257</td>
-      <td>6.084499</td>
-      <td>7.058758</td>
-    </tr>
-    <tr>
-      <th>428</th>
-      <td>8.021913</td>
-      <td>8.694502</td>
-      <td>8.499029</td>
-      <td>7.695303</td>
-      <td>6.745236</td>
-      <td>5.758902</td>
-    </tr>
-    <tr>
-      <th>429</th>
-      <td>9.060331</td>
-      <td>7.467371</td>
-      <td>8.183118</td>
-      <td>3.850148</td>
-      <td>4.430817</td>
-      <td>7.824446</td>
-    </tr>
-    <tr>
-      <th>430</th>
-      <td>8.038189</td>
-      <td>8.349957</td>
-      <td>9.710085</td>
-      <td>6.354370</td>
-      <td>5.484797</td>
-      <td>7.640123</td>
-    </tr>
-    <tr>
-      <th>431</th>
-      <td>9.051696</td>
-      <td>8.613594</td>
-      <td>8.548692</td>
-      <td>9.509407</td>
-      <td>7.227662</td>
-      <td>7.311886</td>
-    </tr>
-    <tr>
-      <th>432</th>
-      <td>9.957834</td>
-      <td>7.057898</td>
-      <td>8.466742</td>
-      <td>5.594711</td>
-      <td>7.191429</td>
-      <td>5.978886</td>
-    </tr>
-    <tr>
-      <th>433</th>
-      <td>7.591862</td>
-      <td>8.076515</td>
-      <td>7.308543</td>
-      <td>7.340187</td>
-      <td>5.874931</td>
-      <td>7.278629</td>
-    </tr>
-    <tr>
-      <th>434</th>
-      <td>9.725019</td>
-      <td>8.274357</td>
-      <td>8.986447</td>
-      <td>6.533789</td>
-      <td>7.771067</td>
-      <td>6.731018</td>
-    </tr>
-    <tr>
-      <th>435</th>
-      <td>10.299003</td>
-      <td>9.396903</td>
-      <td>9.682030</td>
-      <td>9.483036</td>
-      <td>5.204007</td>
-      <td>7.698029</td>
-    </tr>
-    <tr>
-      <th>436</th>
-      <td>10.577146</td>
-      <td>7.266129</td>
-      <td>6.638568</td>
-      <td>8.414052</td>
-      <td>4.532599</td>
-      <td>7.760467</td>
-    </tr>
-    <tr>
-      <th>437</th>
-      <td>9.584040</td>
-      <td>9.647821</td>
-      <td>10.317020</td>
-      <td>6.079933</td>
-      <td>9.605149</td>
-      <td>7.532088</td>
-    </tr>
-    <tr>
-      <th>438</th>
-      <td>9.238928</td>
-      <td>7.591357</td>
-      <td>7.710653</td>
-      <td>6.945051</td>
-      <td>5.123964</td>
-      <td>7.661527</td>
-    </tr>
-    <tr>
-      <th>439</th>
-      <td>7.932721</td>
-      <td>7.437206</td>
-      <td>7.828038</td>
-      <td>4.174387</td>
-      <td>6.167516</td>
-      <td>3.951244</td>
+      <th>161</th>
+      <td>9.428190</td>
+      <td>6.291569</td>
+      <td>5.645447</td>
+      <td>6.995766</td>
+      <td>1.098612</td>
+      <td>7.711101</td>
     </tr>
   </tbody>
 </table>
-<p>430 rows × 6 columns</p>
 </div>
 </div>
 
@@ -15819,557 +13918,133 @@ O atributo está normalmente distribuido, tem como todos os demais uma mediana b
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>9.446913</td>
-      <td>9.175335</td>
-      <td>8.930759</td>
-      <td>5.365976</td>
-      <td>7.891331</td>
-      <td>7.198931</td>
+      <th>66</th>
+      <td>2.197225</td>
+      <td>7.335634</td>
+      <td>8.911530</td>
+      <td>5.164786</td>
+      <td>8.151333</td>
+      <td>3.295837</td>
     </tr>
     <tr>
-      <th>1</th>
-      <td>8.861775</td>
-      <td>9.191158</td>
-      <td>9.166179</td>
-      <td>7.474205</td>
-      <td>8.099554</td>
-      <td>7.482119</td>
+      <th>109</th>
+      <td>7.248504</td>
+      <td>9.724899</td>
+      <td>10.274568</td>
+      <td>6.511745</td>
+      <td>6.728629</td>
+      <td>1.098612</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>8.756682</td>
-      <td>9.083416</td>
-      <td>8.946896</td>
-      <td>7.785305</td>
-      <td>8.165079</td>
-      <td>8.967504</td>
+      <th>128</th>
+      <td>4.941642</td>
+      <td>9.087834</td>
+      <td>8.248791</td>
+      <td>4.955827</td>
+      <td>6.967909</td>
+      <td>1.098612</td>
     </tr>
     <tr>
-      <th>3</th>
-      <td>9.492884</td>
-      <td>7.086738</td>
-      <td>8.347827</td>
-      <td>8.764678</td>
-      <td>6.228511</td>
-      <td>7.488853</td>
+      <th>137</th>
+      <td>8.034955</td>
+      <td>8.997147</td>
+      <td>9.021840</td>
+      <td>6.493754</td>
+      <td>6.580639</td>
+      <td>3.583519</td>
     </tr>
     <tr>
-      <th>4</th>
-      <td>10.026369</td>
-      <td>8.596004</td>
-      <td>8.881558</td>
-      <td>8.272571</td>
-      <td>7.482682</td>
-      <td>8.553525</td>
+      <th>142</th>
+      <td>10.519646</td>
+      <td>8.875147</td>
+      <td>9.018332</td>
+      <td>8.004700</td>
+      <td>2.995732</td>
+      <td>1.098612</td>
     </tr>
     <tr>
-      <th>5</th>
-      <td>9.149847</td>
-      <td>9.019059</td>
-      <td>8.542081</td>
-      <td>6.501290</td>
-      <td>7.492760</td>
-      <td>7.280008</td>
+      <th>154</th>
+      <td>6.432940</td>
+      <td>4.007333</td>
+      <td>4.919981</td>
+      <td>4.317488</td>
+      <td>1.945910</td>
+      <td>2.079442</td>
     </tr>
     <tr>
-      <th>6</th>
-      <td>9.403107</td>
-      <td>8.070594</td>
-      <td>8.850088</td>
-      <td>6.173786</td>
-      <td>8.051978</td>
-      <td>6.300786</td>
+      <th>183</th>
+      <td>10.514529</td>
+      <td>10.690808</td>
+      <td>9.911952</td>
+      <td>10.505999</td>
+      <td>5.476464</td>
+      <td>10.777768</td>
     </tr>
     <tr>
-      <th>7</th>
-      <td>8.933137</td>
-      <td>8.508354</td>
-      <td>9.151227</td>
-      <td>7.419980</td>
-      <td>8.108021</td>
-      <td>7.850104</td>
+      <th>184</th>
+      <td>5.789960</td>
+      <td>6.822197</td>
+      <td>8.457443</td>
+      <td>4.304065</td>
+      <td>5.811141</td>
+      <td>2.397895</td>
     </tr>
     <tr>
-      <th>8</th>
-      <td>8.693329</td>
-      <td>8.201934</td>
-      <td>8.731013</td>
-      <td>6.052089</td>
-      <td>7.447751</td>
-      <td>6.620073</td>
+      <th>187</th>
+      <td>7.798933</td>
+      <td>8.987447</td>
+      <td>9.192075</td>
+      <td>8.743372</td>
+      <td>8.148735</td>
+      <td>1.098612</td>
     </tr>
     <tr>
-      <th>9</th>
-      <td>8.700514</td>
-      <td>9.314070</td>
-      <td>9.845911</td>
-      <td>7.055313</td>
-      <td>8.912608</td>
-      <td>7.648740</td>
+      <th>203</th>
+      <td>6.368187</td>
+      <td>6.529419</td>
+      <td>7.703459</td>
+      <td>6.150603</td>
+      <td>6.860664</td>
+      <td>2.890372</td>
     </tr>
     <tr>
-      <th>10</th>
-      <td>8.121480</td>
-      <td>8.594710</td>
-      <td>9.470703</td>
-      <td>8.389360</td>
-      <td>8.695674</td>
-      <td>7.463937</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>9.483873</td>
-      <td>7.024649</td>
-      <td>8.416931</td>
-      <td>7.258412</td>
-      <td>6.308098</td>
-      <td>6.208590</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>10.364514</td>
-      <td>9.418898</td>
-      <td>9.372204</td>
-      <td>5.659482</td>
-      <td>8.263848</td>
-      <td>7.983099</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>9.962558</td>
-      <td>8.733594</td>
-      <td>9.614605</td>
-      <td>8.037543</td>
-      <td>8.810907</td>
-      <td>6.400257</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>10.112654</td>
-      <td>9.155356</td>
-      <td>9.400217</td>
-      <td>5.683580</td>
-      <td>8.528726</td>
-      <td>7.681560</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>9.235326</td>
-      <td>7.015712</td>
-      <td>8.248267</td>
-      <td>5.983936</td>
+      <th>233</th>
       <td>6.871091</td>
-      <td>6.021023</td>
+      <td>8.513988</td>
+      <td>8.106515</td>
+      <td>6.842683</td>
+      <td>6.013715</td>
+      <td>1.945910</td>
     </tr>
     <tr>
-      <th>16</th>
-      <td>6.927558</td>
-      <td>9.084324</td>
-      <td>9.402695</td>
-      <td>4.897840</td>
-      <td>8.413609</td>
-      <td>6.984716</td>
+      <th>285</th>
+      <td>10.602965</td>
+      <td>6.461468</td>
+      <td>8.188689</td>
+      <td>6.948897</td>
+      <td>6.077642</td>
+      <td>2.890372</td>
     </tr>
     <tr>
-      <th>17</th>
-      <td>8.678632</td>
-      <td>8.725345</td>
-      <td>7.983781</td>
-      <td>6.732211</td>
-      <td>5.913503</td>
-      <td>8.406932</td>
+      <th>289</th>
+      <td>10.663966</td>
+      <td>5.655992</td>
+      <td>6.154858</td>
+      <td>7.235619</td>
+      <td>3.465736</td>
+      <td>3.091042</td>
     </tr>
     <tr>
-      <th>18</th>
-      <td>9.830971</td>
-      <td>8.752581</td>
-      <td>9.220192</td>
-      <td>7.698483</td>
-      <td>7.925519</td>
-      <td>8.064951</td>
-    </tr>
-    <tr>
-      <th>19</th>
-      <td>8.959312</td>
-      <td>7.822044</td>
-      <td>9.155250</td>
-      <td>6.505784</td>
-      <td>7.831220</td>
-      <td>6.216606</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>9.772581</td>
-      <td>8.416046</td>
-      <td>8.434246</td>
-      <td>6.971669</td>
-      <td>7.722678</td>
-      <td>7.661056</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>8.624612</td>
-      <td>6.769642</td>
-      <td>7.605890</td>
-      <td>8.126518</td>
-      <td>5.926926</td>
-      <td>6.343880</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>10.350606</td>
-      <td>7.558517</td>
-      <td>8.404920</td>
-      <td>9.149316</td>
-      <td>7.775276</td>
-      <td>8.374246</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>10.180096</td>
-      <td>10.502956</td>
-      <td>9.999661</td>
-      <td>8.547528</td>
-      <td>8.374938</td>
-      <td>9.712509</td>
-    </tr>
-    <tr>
-      <th>24</th>
-      <td>10.027783</td>
-      <td>9.187686</td>
-      <td>9.531844</td>
-      <td>7.977625</td>
-      <td>8.407825</td>
-      <td>8.661813</td>
-    </tr>
-    <tr>
-      <th>25</th>
-      <td>9.690604</td>
-      <td>8.349957</td>
-      <td>8.935245</td>
-      <td>5.303305</td>
-      <td>8.294799</td>
-      <td>4.043051</td>
-    </tr>
-    <tr>
-      <th>26</th>
-      <td>9.200088</td>
-      <td>6.867974</td>
-      <td>7.958926</td>
-      <td>8.055475</td>
-      <td>5.488938</td>
-      <td>6.725034</td>
-    </tr>
-    <tr>
-      <th>27</th>
-      <td>9.566335</td>
-      <td>6.688355</td>
-      <td>8.021256</td>
-      <td>6.184149</td>
-      <td>4.605170</td>
-      <td>6.249975</td>
-    </tr>
-    <tr>
-      <th>28</th>
-      <td>8.321908</td>
-      <td>9.927399</td>
-      <td>10.164197</td>
-      <td>7.054450</td>
-      <td>9.059982</td>
-      <td>8.557567</td>
-    </tr>
-    <tr>
-      <th>29</th>
-      <td>10.671000</td>
-      <td>7.649693</td>
-      <td>7.866722</td>
-      <td>7.090077</td>
-      <td>7.009409</td>
-      <td>6.712956</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>410</th>
-      <td>8.799812</td>
-      <td>7.647786</td>
-      <td>8.425736</td>
-      <td>7.236339</td>
-      <td>7.528332</td>
-      <td>7.545390</td>
-    </tr>
-    <tr>
-      <th>411</th>
-      <td>7.661998</td>
-      <td>8.098339</td>
-      <td>8.095904</td>
-      <td>7.336286</td>
-      <td>5.459586</td>
-      <td>8.381373</td>
-    </tr>
-    <tr>
-      <th>412</th>
-      <td>4.574711</td>
-      <td>8.190077</td>
-      <td>9.425452</td>
-      <td>4.584967</td>
-      <td>7.996317</td>
-      <td>4.127134</td>
-    </tr>
-    <tr>
-      <th>413</th>
-      <td>8.513787</td>
-      <td>8.488588</td>
-      <td>8.799812</td>
-      <td>9.790655</td>
-      <td>6.815640</td>
-      <td>7.797702</td>
-    </tr>
-    <tr>
-      <th>414</th>
-      <td>8.694335</td>
-      <td>7.595890</td>
-      <td>8.136518</td>
-      <td>8.644530</td>
-      <td>7.034388</td>
-      <td>5.669881</td>
-    </tr>
-    <tr>
-      <th>415</th>
-      <td>8.967249</td>
-      <td>8.707152</td>
-      <td>9.053920</td>
-      <td>7.433075</td>
-      <td>8.171882</td>
-      <td>7.535830</td>
-    </tr>
-    <tr>
-      <th>416</th>
-      <td>8.386857</td>
-      <td>9.300181</td>
-      <td>9.297252</td>
-      <td>6.742881</td>
-      <td>8.814033</td>
-      <td>6.900731</td>
-    </tr>
-    <tr>
-      <th>417</th>
-      <td>8.530109</td>
-      <td>8.612322</td>
-      <td>9.310638</td>
-      <td>5.897154</td>
-      <td>8.156223</td>
-      <td>6.968850</td>
-    </tr>
-    <tr>
-      <th>418</th>
-      <td>6.492240</td>
-      <td>9.047115</td>
-      <td>9.832099</td>
-      <td>4.890349</td>
-      <td>8.815815</td>
-      <td>6.654153</td>
-    </tr>
-    <tr>
-      <th>419</th>
-      <td>9.089415</td>
-      <td>8.238273</td>
-      <td>7.706613</td>
-      <td>6.450470</td>
-      <td>7.365180</td>
-      <td>7.327123</td>
-    </tr>
-    <tr>
-      <th>420</th>
-      <td>8.402007</td>
-      <td>8.569026</td>
-      <td>9.490015</td>
-      <td>3.218876</td>
-      <td>8.827321</td>
-      <td>7.239215</td>
-    </tr>
-    <tr>
-      <th>421</th>
-      <td>9.744668</td>
-      <td>8.486115</td>
-      <td>9.110851</td>
-      <td>6.938284</td>
-      <td>8.135933</td>
-      <td>7.486613</td>
-    </tr>
-    <tr>
-      <th>422</th>
-      <td>10.181119</td>
-      <td>7.227662</td>
-      <td>8.336151</td>
-      <td>6.721426</td>
-      <td>6.854355</td>
-      <td>7.104965</td>
-    </tr>
-    <tr>
-      <th>423</th>
-      <td>9.773664</td>
-      <td>8.212297</td>
-      <td>8.446127</td>
-      <td>6.965080</td>
-      <td>7.497207</td>
-      <td>6.504288</td>
-    </tr>
-    <tr>
-      <th>424</th>
-      <td>9.739791</td>
-      <td>7.966933</td>
-      <td>9.411811</td>
-      <td>6.773080</td>
-      <td>8.074960</td>
-      <td>5.517453</td>
-    </tr>
-    <tr>
-      <th>425</th>
-      <td>9.327501</td>
-      <td>7.786552</td>
-      <td>7.860571</td>
-      <td>9.638740</td>
-      <td>4.682131</td>
-      <td>7.542213</td>
-    </tr>
-    <tr>
-      <th>426</th>
-      <td>9.482960</td>
-      <td>9.142811</td>
-      <td>9.569133</td>
-      <td>8.052296</td>
-      <td>8.532870</td>
-      <td>7.546446</td>
-    </tr>
-    <tr>
-      <th>427</th>
-      <td>10.342130</td>
-      <td>9.722385</td>
-      <td>8.599510</td>
-      <td>9.621257</td>
-      <td>6.084499</td>
-      <td>7.058758</td>
-    </tr>
-    <tr>
-      <th>428</th>
-      <td>8.021913</td>
-      <td>8.694502</td>
-      <td>8.499029</td>
-      <td>7.695303</td>
-      <td>6.745236</td>
-      <td>5.758902</td>
-    </tr>
-    <tr>
-      <th>429</th>
-      <td>9.060331</td>
-      <td>7.467371</td>
-      <td>8.183118</td>
-      <td>3.850148</td>
-      <td>4.430817</td>
-      <td>7.824446</td>
-    </tr>
-    <tr>
-      <th>430</th>
-      <td>8.038189</td>
-      <td>8.349957</td>
-      <td>9.710085</td>
-      <td>6.354370</td>
-      <td>5.484797</td>
-      <td>7.640123</td>
-    </tr>
-    <tr>
-      <th>431</th>
-      <td>9.051696</td>
-      <td>8.613594</td>
-      <td>8.548692</td>
-      <td>9.509407</td>
-      <td>7.227662</td>
-      <td>7.311886</td>
-    </tr>
-    <tr>
-      <th>432</th>
-      <td>9.957834</td>
-      <td>7.057898</td>
-      <td>8.466742</td>
-      <td>5.594711</td>
-      <td>7.191429</td>
-      <td>5.978886</td>
-    </tr>
-    <tr>
-      <th>433</th>
-      <td>7.591862</td>
-      <td>8.076515</td>
-      <td>7.308543</td>
-      <td>7.340187</td>
-      <td>5.874931</td>
-      <td>7.278629</td>
-    </tr>
-    <tr>
-      <th>434</th>
-      <td>9.725019</td>
-      <td>8.274357</td>
-      <td>8.986447</td>
-      <td>6.533789</td>
-      <td>7.771067</td>
-      <td>6.731018</td>
-    </tr>
-    <tr>
-      <th>435</th>
-      <td>10.299003</td>
-      <td>9.396903</td>
-      <td>9.682030</td>
-      <td>9.483036</td>
-      <td>5.204007</td>
-      <td>7.698029</td>
-    </tr>
-    <tr>
-      <th>436</th>
-      <td>10.577146</td>
-      <td>7.266129</td>
-      <td>6.638568</td>
-      <td>8.414052</td>
-      <td>4.532599</td>
-      <td>7.760467</td>
-    </tr>
-    <tr>
-      <th>437</th>
-      <td>9.584040</td>
-      <td>9.647821</td>
-      <td>10.317020</td>
-      <td>6.079933</td>
-      <td>9.605149</td>
-      <td>7.532088</td>
-    </tr>
-    <tr>
-      <th>438</th>
-      <td>9.238928</td>
-      <td>7.591357</td>
-      <td>7.710653</td>
-      <td>6.945051</td>
-      <td>5.123964</td>
-      <td>7.661527</td>
-    </tr>
-    <tr>
-      <th>439</th>
-      <td>7.932721</td>
-      <td>7.437206</td>
-      <td>7.828038</td>
-      <td>4.174387</td>
-      <td>6.167516</td>
-      <td>3.951244</td>
+      <th>343</th>
+      <td>7.431892</td>
+      <td>8.848509</td>
+      <td>10.177932</td>
+      <td>7.283448</td>
+      <td>9.646593</td>
+      <td>3.610918</td>
     </tr>
   </tbody>
 </table>
-<p>436 rows × 6 columns</p>
 </div>
 </div>
 
@@ -16608,7 +14283,7 @@ dtype: float64</pre>
 </li>
 <li><p>Os quatro primeiros componentes principais explicam 92% da variância.</p>
 </li>
-<li><p>A primeira representam melhor as despesas dos clientes e a terceira representa melhor em termos de consumo dos clientes já que têm atributos com peso bem negativos.</p>
+<li><p>A primeira representam melhor as despesas dos clientes com laticinios, produtos de mercearia, e limpeza , a segunda explica a relação de pereciveis, congelados e padaria/frios e a terceira representa a relação da padaria/frios com pereciveis, ou seja uma relação inversamente proporcional e como o gasto total com 'delicatessen' explica menos as despesas dos clientes que a 'fresh' temos que essa dimensão explica  alguma divisão possivel entre clientes que tem mais gasto em um ou no outro.</p>
 </li>
 </ul>
 
@@ -17195,6 +14870,231 @@ Para 8 clusteres: 0.450392718482
 </div>
 
 </div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[277]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span> 
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[277]:</div>
+
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Fresh</th>
+      <th>Milk</th>
+      <th>Grocery</th>
+      <th>Frozen</th>
+      <th>Detergents_Paper</th>
+      <th>Delicatessen</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>440.000000</td>
+      <td>440.000000</td>
+      <td>440.000000</td>
+      <td>440.000000</td>
+      <td>440.000000</td>
+      <td>440.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>12000.297727</td>
+      <td>5796.265909</td>
+      <td>7951.277273</td>
+      <td>3071.931818</td>
+      <td>2881.493182</td>
+      <td>1524.870455</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>12647.328865</td>
+      <td>7380.377175</td>
+      <td>9503.162829</td>
+      <td>4854.673333</td>
+      <td>4767.854448</td>
+      <td>2820.105937</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>3.000000</td>
+      <td>55.000000</td>
+      <td>3.000000</td>
+      <td>25.000000</td>
+      <td>3.000000</td>
+      <td>3.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>3127.750000</td>
+      <td>1533.000000</td>
+      <td>2153.000000</td>
+      <td>742.250000</td>
+      <td>256.750000</td>
+      <td>408.250000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>8504.000000</td>
+      <td>3627.000000</td>
+      <td>4755.500000</td>
+      <td>1526.000000</td>
+      <td>816.500000</td>
+      <td>965.500000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>16933.750000</td>
+      <td>7190.250000</td>
+      <td>10655.750000</td>
+      <td>3554.250000</td>
+      <td>3922.000000</td>
+      <td>1820.250000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>112151.000000</td>
+      <td>73498.000000</td>
+      <td>92780.000000</td>
+      <td>60869.000000</td>
+      <td>40827.000000</td>
+      <td>47943.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[274]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">median</span><span class="p">()</span> 
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[274]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Fresh               8504.0
+Milk                3627.0
+Grocery             4755.5
+Frozen              1526.0
+Detergents_Paper     816.5
+Delicatessen         965.5
+dtype: float64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[270]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cliente_data</span> <span class="o">=</span> <span class="n">true_centers</span>
+<span class="c1"># faz o escalonamento </span>
+<span class="n">cliente_log_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cliente_data</span><span class="p">)</span>
+<span class="c1"># transforma os dados escalonados para PCA e reduz a dimensionalidade</span>
+<span class="n">cliente_pca_data</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">cliente_log_data</span><span class="p">)</span>
+<span class="n">cliente_reduced_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cliente_pca_data</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Dimension 1&#39;</span><span class="p">,</span> <span class="s1">&#39;Dimension 2&#39;</span><span class="p">])</span>
+<span class="c1"># usa o modelo já treinado para prever em que cluster o cliente vai estar</span>
+<span class="n">cliente_preds</span> <span class="o">=</span> <span class="n">clusterer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">cliente_reduced_data</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[271]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cliente_preds</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt output_prompt">Out[271]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([0, 1], dtype=int32)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
@@ -17212,8 +15112,75 @@ Para 8 clusteres: 0.450392718482
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Resposta:</strong></p>
-<p>O primeiro segmento representa os clientes de cafés e lanchonetes relembrando os começo do projeto. Resumindo são estabelecimentos que não revendem diretamente os produtos mas serviços e preparados contendo os produtos.</p>
-<p>O segundo representa mercados, provavelmente varejistas, em contraste com o outro grupo esse vende os produtos diretamente ou melhor revende.</p>
+<p>O segmento 0 representa os clientes de cafés e lanchonetes relembrando os começo do projeto, cluster 0. Resumindo são estabelecimentos que não revendem diretamente os produtos mas serviços e preparados contendo os produtos. E tem um gasto maior em padaria/frios comparando ao outro segmento</p>
+<p>O segmento 1 representa mercados, provavelmente varejistas , cluster 1, em contraste com o outro grupo esse vende os produtos diretamente ou melhor revende. Então a maior saida está em pereciveis.</p>
+<p>Comparando com a mediana temos:</p>
+<table>
+<thead><tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">fresh</th>
+<th style="text-align:center">milk</th>
+<th style="text-align:center">grocery</th>
+<th style="text-align:right">frozen</th>
+<th style="text-align:right">limpeza</th>
+<th style="text-align:center">padaria/frios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">segmento 0</td>
+<td style="text-align:center">menor</td>
+<td style="text-align:center">maior</td>
+<td style="text-align:center">maior</td>
+<td style="text-align:right">menor</td>
+<td style="text-align:right">maior</td>
+<td style="text-align:center">maior</td>
+</tr>
+<tr>
+<td style="text-align:center">segmento 1</td>
+<td style="text-align:center">maior</td>
+<td style="text-align:center">menor</td>
+<td style="text-align:center">menor</td>
+<td style="text-align:right">maior</td>
+<td style="text-align:right">menor</td>
+<td style="text-align:center">menor</td>
+</tr>
+</tbody>
+</table>
+<p>Vemos confirmado o o gráfico das dimensões do PCA.</p>
+<p>Comparando os quartis.</p>
+<table>
+<thead><tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">fresh</th>
+<th style="text-align:center">milk</th>
+<th style="text-align:center">grocery</th>
+<th style="text-align:right">frozen</th>
+<th style="text-align:right">limpeza</th>
+<th style="text-align:center">padaria/frios</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">segmento 0</td>
+<td style="text-align:center">2º</td>
+<td style="text-align:center">4º</td>
+<td style="text-align:center">3º</td>
+<td style="text-align:right">2º</td>
+<td style="text-align:right">3º</td>
+<td style="text-align:center">3º</td>
+</tr>
+<tr>
+<td style="text-align:center">segmento 1</td>
+<td style="text-align:center">3º</td>
+<td style="text-align:center">2º</td>
+<td style="text-align:center">2º</td>
+<td style="text-align:right">3º</td>
+<td style="text-align:right">2º</td>
+<td style="text-align:center">2º</td>
+</tr>
+</tbody>
+</table>
 
 </div>
 </div>
